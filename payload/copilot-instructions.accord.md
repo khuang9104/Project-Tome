@@ -1,5 +1,6 @@
-<!-- accord:copilot:begin version="0.8" -->
-## Agentic Coding Accord — Copilot adapter
-
-Classify answer, diagnose, review, or change; preserve scope. For material work follow `.agents/skills/accord/SKILL.md`, `.accord/accord.yaml`, the relevant procedure and closest canonical owners; use indexes only when needed. For documentation/knowledge creation or broad refresh, run `node .agents/skills/accord/scripts/accord-route.mjs --project . --intent initial-knowledge` (or `knowledge-refresh`). Satisfy required contributions; load conditional ones only when applicable. Reuse valid evidence; `--methods id,id` batches loading. Clear human direction can decide and authorize its scoped Design Input delta; do not re-ask settled choices. Git writes and external effects retain their authority. Ordinary questions read the smallest document. Report actual method/evidence states and checked scope. Preserve instructions outside this block.
+<!-- accord:copilot:begin version="1.0" -->
+Use .agents/skills/accord/SKILL.md with .accord/accord.yaml for durable project
+intent and implementation knowledge. Read relevant owners, record needs/decisions
+during work, and complete affected staged knowledge before a commit. Keep unrelated
+historical gaps progressive. Tests follow Agent/project judgment.
 <!-- accord:copilot:end -->

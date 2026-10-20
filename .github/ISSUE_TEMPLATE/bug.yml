@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem in Accord.
+description: Report a reproducible problem in Project Tome.
 title: "[Bug]: "
 labels:
   - bug
@@ -19,7 +19,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Accord version or commit
+      label: Project Tome version or commit
       placeholder: e.g. RELEASE.json version or commit SHA
     validations:
       required: true

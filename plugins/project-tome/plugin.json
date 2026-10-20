@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "project-tome",
+  "version": "0.2.0",
+  "description": "Set up, inspect and update Project Tome project intent, implementation knowledge and incremental documentation.",
+  "author": {
+    "name": "Toki",
+    "url": "https://github.com/khuang9104"
+  },
+  "repository": "https://github.com/khuang9104/Project-Tome",
+  "license": "MIT",
+  "keywords": [
+    "project-memory",
+    "project-knowledge",
+    "project-documentation",
+    "human-agent-collaboration"
+  ]
+}

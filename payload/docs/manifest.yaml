@@ -24,7 +24,7 @@
       "id": "DOC-CONTEXT",
       "path": "docs/agent-context.md",
       "topics": [
-        "navigation"
+        "continuity"
       ],
       "refs": [],
       "requirements": [],
@@ -54,7 +54,8 @@
       "path": "docs/architecture.md",
       "topics": [
         "architecture",
-        "system-constraints"
+        "system-constraints",
+        "decisions"
       ],
       "refs": [],
       "requirements": [],

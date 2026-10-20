@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Build an explicit, source-free Accord knowledge delivery set.
+// Build an explicit, source-free Project Tome knowledge delivery set.
 // The delivery is a bounded copy of reviewed documents; it never copies source,
-// Git history or Accord control-plane files.
+// Git history or Project Tome control-plane files.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -237,7 +237,7 @@ export function exportKnowledgeDelivery({ projectRoot: projectInput, outputRoot:
     unresolved_references: unresolvedReferences,
     limitations: [
       'This package selects project documents and text-only registered inputs; their declared review/gap states remain unchanged. It contains no source or Git history.',
-      'Source-free question answering or reconstruction still requires an independent Agent run and V&V review.'
+      'Source-free question answering still requires independent semantic review of relevant intent and implementation.'
     ]
   };
   if (!dryRun) {

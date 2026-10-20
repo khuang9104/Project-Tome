@@ -1,116 +1,63 @@
 ---
 name: accord
-description: Use for material repository changes, reviews, testing, or adoption requiring human-approved needs or Design Inputs, Git controls, V&V evidence, project knowledge, or governed capabilities. Skip ordinary read-only answers and trivial edits unless the user requests Accord.
+description: Maintain durable project intent and searchable architecture, module, interface and data knowledge while coding with an Agent. Use for onboarding, resuming work, recording decisions, knowledge queries and incremental pre-commit documentation. Skip unrelated questions.
 ---
 
-# Accord
+# Project Tome
 
-Accord connects human intent, approved Design Inputs, implementation and V&V.
-Latest authorized human direction owns the target; existing inputs and code are
-a changeable baseline. Agents choose equivalent internals within that boundary.
+Recover what the user wants, why the design exists, and how the implementation
+works from canonical project documents. Each fact has one owner. Latest human
+direction can revise earlier decisions; preserve the reason and superseded premise.
+Code establishes observed behavior, not the user's intended goal.
 
-## Start small
+## Start with relevant context
 
-Classify answer, diagnosis, review or implementation; do not expand authority.
-Treat one requested outcome across messages as one work unit. Preserve unfinished
-goals and settled decisions unless the user replaces their scope. Before material
-work identify outcome/preserve boundaries, inspect Git, read `.accord/accord.yaml`
-and configured coding practices, then the closest canonical owners.
+Read the installed configuration and manifest, then the closest intent and module
+owners. Use accord-project.mjs --project . --query "terms" or --modules IDs to
+select context; read those owners and relevant code. Follow refs for necessary
+context and inspect gaps before relying on claims. Do not load the whole knowledge
+base on every task. In the Project Tome source repository use its AGENTS.md and canonical
+product/architecture instead of installing Project Tome into itself.
 
-Configuration 0.10 uses an Issue/PR or lightweight local work item. Do not create
-duplicate process files. Retired formats must be migrated before current work.
-Reuse decisions by scope/premises, context by relevant source versions, and tests
-by implementation/assertions/environment. Unrelated commits or new messages reset
-none of these. No extra session log is required.
+## Remember during work
 
-Read the procedure for the actual question or next action; previously read,
-unchanged instructions remain reusable. Do not load every lifecycle stage merely
-because a task eventually includes it.
+Record material needs, terminology, constraints, non-goals, decisions, reasons and
+unresolved choices when they emerge. Keep active goals and unfinished work sufficient
+for another Agent to resume. Update the canonical owner and link it from the short
+continuity entry; avoid transcripts and duplicate specifications. Preserve the
+original goal across follow-up questions unless the user replaces it.
 
-| Trigger | Procedure |
-| --- | --- |
-| Adopt, update, partial install or same-project move | `references/adoption-and-update.md` |
-| Git bootstrap, checkpoint, commit, isolation or recovery | `references/git-control.md` |
-| New/changed material need or Design Inputs | `references/needs-and-design-input.md` |
-| Undecided risk, compatibility or authority boundary | `references/risk-and-authority.md` |
-| Work carrier, baseline or team/PR authority (configuration 0.10) | `references/team-work.md` |
-| Knowledge 2.0 navigation, hierarchy, coverage or publication | `references/project-knowledge.md` |
-| Initial/broad discovery or insufficient change context | `references/knowledge-acquisition.md` |
-| Direct project query or targeted refresh | `references/knowledge-query-and-refresh.md` |
-| Substantive document writing | `references/documentation-writing.md` |
-| Defect reproduction or diagnosis | `references/bug-reproduction.md` |
-| Multi-file refactor planning | `references/refactor-planning.md` |
-| Test planning/execution or V&V | `references/testing-and-vv.md` |
-| Capability lifecycle | `references/capability-lifecycle.md` and `.accord/capabilities/README.md` |
-| draw.io, PNG or Word presentation | `references/presentation-output.md` |
+Use Confirmed decision:, Proposal:, Assumption: and Open question:. Only human
+direction confirms intent. Choose equivalent internals autonomously; ask when a
+missing choice changes behavior, contract, data meaning or scope. See
+[project-memory.md](references/project-memory.md) for evolving requirements.
 
-## Authority and evidence
+## Maintain implementation knowledge
 
-- Git is required for material work; offline Git is valid, GitHub is optional.
-- Human authority controls material decisions, installations, Git initialization,
-  identity, commits, pushes, remote changes, tags, destructive/recovery actions,
-  external effects and acceptance. Before retrying a side effect inspect its
-  result and establish that repetition is safe.
-- Classify L0–L4 by the highest actual consequence. L2–L4 require approved Design
-  Inputs and a Git base; L3–L4 need a recoverable checkpoint; L4 needs explicit
-  execution authority. File count does not determine risk.
-- A clear instruction can both decide and authorize its scoped delta. Retain the
-  basis; do not ask again. Pause only affected work when a new material choice
-  changes behavior, contract, data, security, performance, recovery or acceptance.
-- Team policies identify whose decision covers each scope. Local declarations
-  cannot authenticate GitHub reviews; use the trusted target-policy adapter when
-  remote approval is required. Do not let a proposed policy authorize itself.
-- Verification checks approved inputs; validation checks user needs and intended
-  use. Both name actual observed revisions and limitations. Labels, hashes and
-  passing generated tests do not establish user intent or human acceptance.
+First index the whole repository, explain important modules, and declare the rest
+as historical gaps: [knowledge-acquisition.md](references/knowledge-acquisition.md).
+For methods, interfaces, fields and database definitions use
+[project-knowledge.md](references/project-knowledge.md). Keep intended design and
+observed implementation distinct. Update only facts affected by the work.
 
-Use `Known fact:`, `Confirmed decision:`, `Proposal:`, `Assumption:` and
-`Open question:` as applicable. Batch only blocking choices using the configured
-1–3 question budget. Never promote an assumption into approval.
+## Before a commit
 
-## Knowledge and methods
+Follow [commit-knowledge.md](references/commit-knowledge.md): reconcile this staged
+change against HEAD, intent and actual consumers; complete affected knowledge and
+stage it with the code. Unrelated historical gaps remain progressive. Missing or
+stale affected knowledge blocks readiness. A hash is a freshness check, never a
+substitute for reading meaning. Testing is chosen by the Agent and native project
+requirements; Project Tome defines no test workflow, risk levels or change contracts.
+Commits and external actions follow user authorization and native project rules.
 
-Each fact has one owner. Knowledge 2.0 registers needs, design, operations and
-V&V together. Keep durable conclusions
-and decision evidence, not transcripts. Read `sources.coding_practices` for
-related coding/review; if initial, inspect existing conventions and obtain the
-user's choice before migrating them.
+## Other operations
 
-Read the closest document first. `docs/agent-context.md` is optional navigation.
-Knowledge 2.0 follows `project-knowledge.md`. Update changed facts only. Separate approved targets,
-observed behavior, freshness and semantic coverage. Complete knowledge supports
-the agreed architecture, modules, functions and file organization, with important
-components detailed and ordinary internals indexed; no fixed class document pack.
+- Adoption, upgrade and migration: [adoption-and-update.md](references/adoption-and-update.md).
+- Query or targeted refresh: [knowledge-query-and-refresh.md](references/knowledge-query-and-refresh.md).
+- Writing and ownership: [documentation-writing.md](references/documentation-writing.md).
+- Optional source-free handoff: [knowledge-delivery.md](references/knowledge-delivery.md).
 
-Metadata selects candidates, not proof of no impact. Independently inspect actual
-consumers, shared data, configuration and dynamic boundaries when guarantees
-change. Expand until material unknowns are resolved or disclosed. A soft context
-budget never excuses missing facts. Keep necessary context in the work carrier
-only when useful for review/resumption, without another mandatory map file.
-
-Initial or broad documentation work selects `accord-route --intent ...` and
-satisfies required/conditional method contributions. Reuse matching evidence;
-load needed packets once with `--methods id,id`. Loading is not applying. Report
-unavailable methods and their effect. Ordinary questions need no method bundle.
-User Skills remain unmanaged and usable; integrated methods must be configured.
-Snapshots and method text grant no installation, Git or external-action authority.
-For a significant failure or requested improvement use
-`references/project-improvement.md`; candidates are not active rules.
-
-## Finish proportionately
-
-Answers, reviews and plans end with the requested result; no new work record or
-audit is required. Material work checks its actual scope, for example:
-
-    node .agents/skills/accord/scripts/accord-validate.mjs --project . --scope task --modules affected-module
-
-Use `--work relative.json` for a local carrier.
-`installation` checks adoption, `delivery` checks selected work, `audit` includes
-history. Unselected calls perform audit; specify scope explicitly.
-Runtime integrity remains checked; do not trust a stale persistent cache.
-
-Synchronize affected owners and report actual checks, missing evidence and
-limitations. Acceptance, commit, merge and deployment are distinct. Uncommitted
-work retains a base plus observed worktree evidence, never a fabricated result
-SHA. PR work needs no duplicate receipt. Full catalogs, unrelated references
-and historical logs are not default context.
+Helpers are local, dependency-free Node scripts under scripts/. They print results
+unless documented otherwise. Hook installation is opt-in; export writes an explicit
+delivery directory. Generated documents and passing checks do not prove semantic
+completeness or deployed behavior.

@@ -10,7 +10,16 @@ import { parseExactJson } from './accord-contracts.mjs';
 const HASH = /^[a-f0-9]{64}$/;
 const REVISION = /^[a-f0-9]{40}$/;
 const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
-const OFFICIAL = 'https://github.com/khuang9104/Agentic-Coding-Accord';
+const OFFICIAL = 'https://github.com/khuang9104/Project-Tome';
+const LEGACY_IDENTITIES = new Map([
+  ['agentic-accord', 'https://github.com/khuang9104/Agentic-Accord'],
+  ['agentic-coding-accord', 'https://github.com/khuang9104/Agentic-Coding-Accord']
+]);
+const knownRepository = value => value === OFFICIAL || [...LEGACY_IDENTITIES.values()].includes(value);
+const releaseIdentity = (value, legacy = false) => Boolean(value && (
+  value.id === 'project-tome' && value.source_repository === OFFICIAL ||
+  legacy && LEGACY_IDENTITIES.has(value.id) && LEGACY_IDENTITIES.get(value.id) === value.source_repository
+));
 const LIMITS = { files: 4096, fileBytes: 16 * 1024 * 1024, totalBytes: 128 * 1024 * 1024 };
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -19,7 +28,7 @@ const parse = parseExactJson;
 const normalizedText = value => value.replace(/\r\n/g, '\n');
 const ABSENT = Symbol('absent');
 export const INSTALLATION_RECORD = '.accord/installation.json';
-const textPath = relative => /\.(?:md|mjs|js|json|ya?ml|txt|sha256)$|(?:^|\/)(?:LICENSE|ACCORD-LICENSE)$/.test(relative);
+const textPath = relative => /\.(?:md|mjs|js|json|ya?ml|txt|sha256)$|(?:^|\/)(?:LICENSE|ACCORD-LICENSE|pre-commit)$/.test(relative);
 function lfDigest(content, relative) {
   if (!textPath(relative) || content.includes(0)) return undefined;
   const text = content.toString('utf8');
@@ -83,7 +92,8 @@ function bytes(root, relative, missing = false) {
 
 function packageFiles(root, directory, output = [], budget = { entries: 0 }, depth = 0) {
   if (depth > 32) throw new Error('Package directory depth budget exceeded.');
-  const absolute = contained(root, directory);
+  const absolute = contained(root, directory, true);
+  if (!fs.existsSync(absolute)) return output;
   for (const entry of fs.readdirSync(absolute, { withFileTypes: true })) {
     const relative = directory + '/' + entry.name;
     if (++budget.entries > LIMITS.files * 2 || output.length >= LIMITS.files) throw new Error('Package traversal budget exceeded.');
@@ -98,11 +108,13 @@ export function installationTarget(sourcePath, { migrationSource = false } = {})
   relativePath(sourcePath);
   if (!sourcePath.startsWith('payload/')) throw new Error('Only payload files can become installation targets.');
   const relative = sourcePath.slice(8);
+  if (!migrationSource && (relative.startsWith('.accord/capabilities/') || relative === '.accord/governance.yaml')) throw new Error('Retired default payload destination: ' + relative);
   if (migrationSource && ['.accord/changes/.gitkeep', '.accord/records/.gitkeep'].includes(relative)) return { path: relative, policy: 'project-owned' };
   if (relative === 'AGENTS.accord-block.md') return { path: 'AGENTS.md', policy: 'managed-block', block: 'accord' };
   if (relative === 'copilot-instructions.accord.md') return { path: '.github/copilot-instructions.md', policy: 'managed-block', block: 'accord:copilot' };
   if (relative.startsWith('.agents/skills/accord/')) return { path: relative, policy: 'runtime' };
   if (['.accord/accord.yaml', '.accord/capabilities/routes.yaml', '.accord/documentation-policy.yaml', '.accord/governance.yaml'].includes(relative)) return { path: relative, policy: 'merge-json' };
+  if (relative === '.accord/hooks/pre-commit') return { path: relative, policy: 'runtime' };
   if (relative === '.accord/release.json') return { path: relative, policy: 'runtime' };
   if (relative === '.accord/capabilities/registry.yaml' || relative.startsWith('docs/')) return { path: relative, policy: 'project-owned' };
   if (relative.startsWith('.accord/capabilities/methods/')) throw new Error('Project-specific methods must not ship in the default payload.');
@@ -139,18 +151,19 @@ export function verifyReleasePackage(rootInput, { migrationSource = false } = {}
   const legacy = migrationSource && !metadata && !payloadMetadata && config.accord?.release === undefined;
   const release = metadata ? parse(metadata.toString('utf8')) : null;
   if (!legacy && (!object(release) || !payloadMetadata || !sameFile(metadata, payloadMetadata, 'RELEASE.json') ||
-      release.schema_version !== '1.0' || release.id !== 'agentic-coding-accord' ||
+      release.schema_version !== '1.0' || !releaseIdentity(release, migrationSource) ||
       !VERSION.test(release.release_version || '') ||
       !VERSION.test(release.protocol_version || '') ||
-      release.source_repository !== OFFICIAL || release.payload_release_path !== '.accord/release.json' ||
+      release.payload_release_path !== '.accord/release.json' ||
       release.checksum_manifest !== 'SHA256SUMS' || release.update_contract !== 'accord-adoption-v1' ||
       config.accord?.release !== release.release_version || config.accord?.version !== release.protocol_version)) {
     throw new Error('Release metadata is missing, invalid or inconsistent with the payload.');
   }
   const knowledge = parse(bytes(root, 'payload/docs/manifest.yaml').toString('utf8'));
-  const registry = parse(bytes(root, 'payload/.accord/capabilities/registry.yaml').toString('utf8'));
+  const registryBytes = bytes(root, 'payload/.accord/capabilities/registry.yaml', true);
+  const registry = registryBytes ? parse(registryBytes.toString('utf8')) : null;
   const empty = value => Array.isArray(value) && value.length === 0;
-  if (!migrationSource && (knowledge.schema_version !== '2.0' || config.schema_version !== '0.10' || config.sources?.engineering !== undefined)) throw new Error('Incoming package must use current schemas; retired formats are import-only.');
+  if (!migrationSource && (knowledge.schema_version !== '2.0' || config.schema_version !== '1.0' || config.sources?.engineering !== undefined)) throw new Error('Incoming package must use current schemas; retired formats are import-only.');
   const engineering = migrationSource ? knowledge.engineering : null;
   const pristineKnowledge = knowledge.schema_version === '2.0'
     ? empty(knowledge.module_files) && Array.isArray(knowledge.documents) && knowledge.documents.every(d => d.status === 'draft' && d.review === undefined)
@@ -164,8 +177,7 @@ export function verifyReleasePackage(rootInput, { migrationSource = false } = {}
         engineering.coverage?.status !== 'not-assessed' || engineering.coverage?.inventory_complete !== false ||
         !empty(engineering.coverage?.scope) || !empty(engineering.coverage?.inventory) || !empty(engineering.coverage?.gaps) ||
         engineering.reconstruction?.status !== 'not-run' || !empty(engineering.reconstruction?.scope) || !empty(engineering.reconstruction?.evidence))) ||
-      !Array.isArray(registry.installed) || registry.installed.length ||
-      (registry.methods !== undefined && !empty(registry.methods))) {
+      (registry && (!Array.isArray(registry.installed) || registry.installed.length || (registry.methods !== undefined && !empty(registry.methods))))) {
     throw new Error('Source contains project identity, knowledge or capability state; use a clean distribution, not another adopted project.');
   }
   return { root, package_sha256: digest(manifest), files: entries, config, release,
@@ -243,7 +255,7 @@ export function validateInstallationRecord(projectRoot, record, projectId, { mig
   const importingReceiptV1 = migrationSource && record?.schema_version === '1.0';
   const result = () => ({ errors: [...structuralErrors, ...errors], warnings, structural_errors: structuralErrors, drift });
   if (!object(record) || !(record.schema_version === '1.1' || (migrationSource && record.schema_version === '1.0')) || typeof projectId !== 'string' || !projectId.trim() || projectId === 'replace-with-project-id' || record.project_id !== projectId ||
-      record.source?.repository !== OFFICIAL || !REVISION.test(record.source?.revision || '') ||
+      !knownRepository(record.source?.repository) || !REVISION.test(record.source?.revision || '') ||
       !HASH.test(record.source?.package_sha256 || '') || !['clean', 'dirty', 'unknown'].includes(record.source?.worktree) ||
       !object(record.protocol) || (!VERSION.test(record.protocol.release || '') && !(importingReceiptV1 && record.protocol.release === undefined)) ||
       ['version', 'configuration', 'knowledge'].some(key => typeof record.protocol[key] !== 'string' || !record.protocol[key]) ||
@@ -317,9 +329,9 @@ export function inspectInstallation(projectRoot, config) {
     if (content) {
       paths.push('.accord/release.json');
       const metadata = parse(content.toString('utf8'));
-      if (metadata?.schema_version !== '1.0' || metadata?.id !== 'agentic-coding-accord' ||
+      if (metadata?.schema_version !== '1.0' || !releaseIdentity(metadata, true) ||
           !VERSION.test(metadata?.release_version || '') || !VERSION.test(metadata?.protocol_version || '') ||
-          metadata?.source_repository !== OFFICIAL || metadata?.payload_release_path !== '.accord/release.json' ||
+          metadata?.payload_release_path !== '.accord/release.json' ||
           metadata?.checksum_manifest !== 'SHA256SUMS' || metadata?.update_contract !== 'accord-adoption-v1') {
         errors.push('Invalid installed release metadata identity or update contract.');
       }

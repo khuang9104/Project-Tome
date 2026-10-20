@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.10",
+  "schema_version": "1.0",
   "accord": {
-    "version": "0.11.0",
-    "release": "0.11.0",
+    "version": "0.12.0",
+    "release": "0.12.0",
     "installation": "vendored",
     "installation_record": ".accord/installation.json"
   },
@@ -24,26 +24,6 @@
       "github-copilot-vscode"
     ]
   },
-  "authority": {
-    "project": "human-user",
-    "agent_autonomy": "bounded-by-approved-change"
-  },
-  "version_control": {
-    "required": true,
-    "initialization": "user-approved",
-    "commit_mode": "propose",
-    "push_mode": "explicit",
-    "baseline_commit_required": true,
-    "l3_l4_checkpoint_required": true
-  },
-  "information": {
-    "profile": "compact",
-    "module_contracts": "conditional",
-    "traceability": "stable-references"
-  },
-  "sources": {
-    "coding_practices": "docs/engineering/coding-practices.md"
-  },
   "knowledge_base": {
     "required": true,
     "structure_version": "2.0",
@@ -61,93 +41,9 @@
       "max_files_visited": 20000,
       "max_directories_visited": 3000,
       "max_duration_ms": 10000
-    },
-    "size_budgets": {
-      "README.md": 4000,
-      "agent-context.md": 8000,
-      "system-overview.md": 8000,
-      "architecture.md": 14000,
-      "interfaces-and-data.md": 14000,
-      "glossary.md": 8000,
-      "modules/README.md": 10000,
-      "module": 10000
     }
-  },
-  "capabilities": {
-    "catalog": ".accord/capabilities/catalog/index.yaml",
-    "catalog_export": ".accord/capabilities/catalog.yaml",
-    "registry": ".accord/capabilities/registry.yaml",
-    "routes": ".accord/capabilities/routes.yaml",
-    "snapshot_root": ".accord/capabilities/snapshots",
-    "snapshot_mode": "compressed-non-discoverable",
-    "snapshot_integrity": "bundle-file-and-pinned-tree-sha",
-    "install_root": ".agents/skills",
-    "discovery": "need-driven-user-choice",
-    "installation": "explicit-human-approval",
-    "dependency_installation": "separate-explicit-human-approval",
-    "updates": "explicit-human-approval",
-    "removal": "explicit-human-approval",
-    "unmanaged_use": "allowed-record-material-use",
-    "unmanaged_lifecycle": "user-controlled"
-  },
-  "risk": {
-    "levels": [
-      "L0",
-      "L1",
-      "L2",
-      "L3",
-      "L4"
-    ],
-    "classification": "highest-triggered-impact",
-    "approval_policy": {
-      "pre_implementation_required": [
-        "L2",
-        "L3",
-        "L4"
-      ],
-      "design_review_required": [
-        "L3",
-        "L4"
-      ],
-      "explicit_execution_gate": [
-        "L4"
-      ]
-    }
-  },
-  "clarification": {
-    "mode": "intent-aligned",
-    "question_budget": {
-      "default_batch_size": 3,
-      "ask_only_blocking_questions": true
-    }
-  },
-  "gates": {
-    "design_input_ready": {
-      "applies_to": [
-        "L2",
-        "L3",
-        "L4"
-      ],
-      "human_confirms_material_baseline": true
-    }
-  },
-  "vv": {
-    "verification_target": "approved-requirements-and-design-inputs",
-    "validation_target": "user-needs-and-intended-use",
-    "revision_binding_required": true,
-    "schema_version": "1.0",
-    "test_root": "tests",
-    "layout_exceptions": [],
-    "checks": []
   },
   "documentation": {
     "policy": ".accord/documentation-policy.yaml"
-  },
-  "governance": {
-    "policy": ".accord/governance.yaml"
-  },
-  "work": {
-    "carrier": "github-preferred",
-    "local_directory": ".accord/work"
   }
 }

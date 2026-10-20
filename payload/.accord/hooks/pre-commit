@@ -1,0 +1,3 @@
+#!/bin/sh
+# Run from Git's repository root; inspect the staged snapshot only.
+exec node .agents/skills/accord/scripts/accord-validate.mjs --project . --scope commit

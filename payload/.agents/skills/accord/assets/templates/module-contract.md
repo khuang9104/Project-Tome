@@ -1,35 +1,15 @@
-# Module Contract
+# Module knowledge example
 
-Reuse an existing owner first. Create this source only for a stable, public,
-independently maintained, separately released, shared-data or risky boundary.
-A short contract may stay in a module page. Keep only applicable content;
-link exact schemas/types and existing V&V instead of copying them. Distinguish
-approved target, observed implementation and unresolved differences.
+Use an existing owner or adapt this structure; no per-module file pack is required.
 
-## Purpose and Boundary
+- Responsibility, boundaries, source entry points and dependencies.
+- Execution/data flow and important design rationale (link needs/decisions).
+- Method/function inventory with source symbol, parameters/types/required/defaults,
+  valid values, outputs, errors, effects and caller constraints.
+- Interfaces and fields, enum meanings, ranges/units and compatibility.
+- Repository-defined database tables/fields/keys/relationships where applicable;
+  link design, ORM/schema/migrations and existing monitoring evidence.
+- Target versus observed behavior, remaining coverage gaps and assumptions.
 
-- Responsibility:
-- Provider, consumers and dependencies (including unknown external users):
-- Included and excluded behavior:
-- Allocated requirements:
-
-## Interface and Behavior
-
-- Input conditions and output guarantees (including units and completion):
-- API, event, file, or protocol contracts:
-- State and invariants:
-- Errors, cancellation, retry/idempotency, side effects and concurrency:
-
-## Data and Quality
-
-- Owned data, schema, migration, and retention:
-- Required performance/resource floors and measurement conditions:
-- Security, permissions, privacy, and compatibility:
-- Observability and operational behavior:
-
-## Evidence references
-
-Link approved input IDs, provider/consumer checks and integrated scenarios in
-the existing V&V owner. Results, revisions and limitations belong there, not in
-a second test log. No passing test or unchanged signature establishes every
-behavioral guarantee.
+Register the owner and refs once. A current module must have affected coverage
+completed and observations refreshed after semantic review.

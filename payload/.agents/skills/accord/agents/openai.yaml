@@ -1,4 +1,4 @@
 interface:
-  display_name: "Accord Agentic Engineering Workflow"
-  short_description: "Govern inputs, capabilities, V&V, and knowledge"
-  default_prompt: "Use $accord to inspect Git, the configured coding practices, approved capability registry, and project knowledge manifest; form Design Inputs, govern the change, refresh affected knowledge, bind V&V evidence to revisions, and prepare an acceptance commit for my approval."
+  display_name: "Project Tome Project Knowledge"
+  short_description: "Maintain project intent and implementation knowledge"
+  default_prompt: "Use $accord to recover relevant project context, record needs and decisions, maintain detailed implementation knowledge, and reconcile affected staged knowledge before a commit."

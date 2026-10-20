@@ -86,7 +86,7 @@ function loadConfig(projectRoot) {
 }
 
 function managedDocumentationPaths(projectRoot, config) {
-  // A shared docs/ folder is not owned wholesale by Accord. Without its manifest,
+  // A shared docs/ folder is not owned wholesale by Project Tome. Without its manifest,
   // existing architecture and module documents remain discovery input.
   if (config.knowledge_base?.root !== 'docs') return new Set();
   try {
