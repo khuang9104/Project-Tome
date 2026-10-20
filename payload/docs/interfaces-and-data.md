@@ -1,37 +1,7 @@
-# Interfaces and Data
+# Interfaces and data
 
-## External Interfaces
-
-Index public APIs, commands, events, files, user surfaces and integrations by
-owner and stable identifier. Link the module's field-level contract and examples;
-keep only genuinely shared contracts here, with all inputs, outputs, errors,
-permissions and relevant ordering/retry/idempotency rules.
-
-## Internal Interfaces
-
-Describe material module-to-module calls, messages, events, or shared contracts.
-
-## Data Stores and Ownership
-
-Describe stores, domain owners and cross-module relationships. Link complete
-field/enum dictionaries and state rules in their canonical module or exact
-contract artifact; no duplicate tables. Explain shared lifecycle and consistency
-constraints and identify unverified/conflicting mappings.
-
-## Data Flows
-
-Explain how important data enters, changes, moves, and leaves the system.
-
-## Interface Versions and Consumers
-
-Describe interface versions, known consumers, and compatibility contracts. Link
-existing migration requirements rather than copying them.
-
-## Provenance
-
-List the interface definitions, schemas, configurations, tests, and documents
-used to derive this view.
-
-| Source path | Contribution |
-| --- | --- |
-| `replace/with/project/path` | Replace this draft row with an inspected source. |
+Draft seed: link canonical interfaces/schemas and detailed explanations. Record
+methods, parameters/results/errors, fields, types, nullability/defaults, enums with
+meanings, ranges/units. Database design plus repository ORM/DDL/migrations establish
+tables, fields, relationships and constraints. Link existing monitoring evidence;
+no live access is required. Keep target, code and deployment observations distinct.

@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "coverage": "all-maintained-files",
+  "rules": [
+    {
+      "id": "system-memory",
+      "kinds": [
+        "system"
+      ],
+      "topics": [
+        "needs",
+        "decisions",
+        "continuity",
+        "architecture"
+      ],
+      "layout": "combined-or-split"
+    },
+    {
+      "id": "module-knowledge",
+      "kinds": [
+        "module"
+      ],
+      "topics": [
+        "responsibility",
+        "contracts",
+        "source-map"
+      ],
+      "layout": "combined-or-split"
+    }
+  ],
+  "excludes": [
+    {
+      "path": ".agents/skills/tome",
+      "reason": "Project Tome runtime, not product source."
+    },
+    {
+      "path": ".tome",
+      "reason": "Project Tome metadata and local hook."
+    },
+    {
+      "path": "AGENTS.md",
+      "reason": "Agent routing entry."
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "reason": "Agent routing entry."
+    },
+    {
+      "path": "TOME-LICENSE",
+      "reason": "Project Tome distribution license."
+    }
+  ]
+}

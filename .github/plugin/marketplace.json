@@ -1,19 +1,19 @@
 {
-  "name": "agentic-coding-accord",
+  "name": "project-tome",
   "owner": {
     "name": "Toki",
     "url": "https://github.com/khuang9104"
   },
   "metadata": {
-    "description": "Official Accord project setup and update entry.",
-    "version": "0.1.1"
+    "description": "Official Project Tome project setup and update entry.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
-      "name": "agentic-coding-accord",
-      "description": "Set up, inspect and update Accord's project-local requirements, V&V and engineering documentation workflow.",
-      "version": "0.1.1",
-      "source": "./plugins/agentic-coding-accord"
+      "name": "project-tome",
+      "description": "Set up, inspect and update Project Tome project intent, implementation knowledge and incremental documentation.",
+      "version": "0.2.0",
+      "source": "./plugins/project-tome"
     }
   ]
 }

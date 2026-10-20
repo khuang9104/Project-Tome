@@ -8,7 +8,7 @@ The current `main` branch is supported. Older snapshots may not receive security
 
 Please do not open a public issue for a suspected vulnerability. Use GitHub's private vulnerability reporting for this repository when available:
 
-<https://github.com/khuang9104/Agentic-Coding-Accord/security>
+<https://github.com/khuang9104/Project-Tome/security>
 
 Include only the information needed to reproduce and assess the issue. Do not publish credentials, private source code, personal data, or an exploit before the issue has been reviewed.
 

@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "tome": {
+    "version": "0.12.0",
+    "release": "0.12.0",
+    "installation": "vendored",
+    "installation_record": ".tome/installation.json"
+  },
+  "project": {
+    "id": "replace-with-project-id",
+    "name": "Replace with project name"
+  },
+  "repository": {
+    "vcs": "git",
+    "offline_capable": true,
+    "remote": {
+      "mode": "none",
+      "provider": null
+    }
+  },
+  "agents": {
+    "supported": [
+      "codex",
+      "github-copilot-vscode"
+    ]
+  },
+  "knowledge_base": {
+    "required": true,
+    "structure_version": "2.0",
+    "root": "docs",
+    "manifest": "docs/manifest.yaml",
+    "source_content_included": false,
+    "generation_mode": "agent-derived",
+    "refresh_policy": "change-impact",
+    "excludes": [],
+    "inventory": {
+      "respect_gitignore": true,
+      "max_depth": 6,
+      "max_tree_entries": 400,
+      "max_category_entries": 80,
+      "max_files_visited": 20000,
+      "max_directories_visited": 3000,
+      "max_duration_ms": 10000
+    }
+  },
+  "documentation": {
+    "policy": ".tome/documentation-policy.yaml"
+  }
+}

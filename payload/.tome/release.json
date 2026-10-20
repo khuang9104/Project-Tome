@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "id": "project-tome",
+  "release_version": "0.12.0",
+  "protocol_version": "0.12.0",
+  "source_repository": "https://github.com/khuang9104/Project-Tome",
+  "payload_release_path": ".tome/release.json",
+  "checksum_manifest": "SHA256SUMS",
+  "update_contract": "tome-adoption-v1"
+}
