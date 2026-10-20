@@ -119,7 +119,7 @@ export function stagedChanges(root) {
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
   try {
-    if (process.argv.includes('--help')) { console.log('accord-scope.mjs --project DIR --paths PATH,PATH [--staged | --revision FULL_SHA]'); process.exit(0); }
+    if (process.argv.includes('--help')) { console.log('tome-scope.mjs --project DIR --paths PATH,PATH [--staged | --revision FULL_SHA]'); process.exit(0); }
     const args = {};
     for (let i = 2; i < process.argv.length; i++) {
       const key = process.argv[i];

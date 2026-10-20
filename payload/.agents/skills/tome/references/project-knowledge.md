@@ -7,7 +7,7 @@ pack is required per module or change.
 
 ## Registry
 
-A manifest contains schema_version 2.0, structure accord-project-knowledge,
+A manifest contains schema_version 2.0, structure tome-project-knowledge,
 knowledge_root, status draft/current, module_files, documents, optional exact_contracts.
 A module has id, parent (or null), kinds, literal source_paths, depends_on, status
 draft/current, gaps, not_applicable and documents. Longest source prefix wins;

@@ -14,7 +14,7 @@ const pointerOf = parts => '#' + parts.map(part => '/' + escapePointer(part)).jo
 
 function restricted(relative) {
   const normalized = relative.toLowerCase().replaceAll('\\', '/');
-  return normalized.split('/').some(part => ['.git', '.accord', '.agents', 'node_modules', 'vendor'].includes(part) ||
+  return normalized.split('/').some(part => ['.git', '.tome', '.agents', 'node_modules', 'vendor'].includes(part) ||
     /[. ]$/.test(part) || /^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/.test(part)) ||
     /^\.github\/skills(?:\/|$)/.test(normalized) ||
     /^\.env(?:\.|$)/.test(path.posix.basename(normalized)) || /\.(?:pem|key|p12|pfx)$/.test(normalized);
@@ -278,7 +278,7 @@ export function main(args) {
     const key = args[index];
     if (!['--project', '--source', '--format', '--compare', '--view'].includes(key) ||
         own(values, key) || !args[index + 1] || args[index + 1].startsWith('--')) {
-      throw new Error('Usage: accord-contracts.mjs --project <root> --source <relative> --format <json-schema|openapi-json> [--compare <relative>] [--view json|markdown]');
+      throw new Error('Usage: tome-contracts.mjs --project <root> --source <relative> --format <json-schema|openapi-json> [--compare <relative>] [--view json|markdown]');
     }
     values[key] = args[index + 1];
   }

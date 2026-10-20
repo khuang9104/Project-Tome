@@ -1,7 +1,7 @@
 # Acquiring project knowledge
 
 Inspect existing needs, design, docs and Git before adding files. Reuse owners.
-Run accord-inventory.mjs --project . for bounded file/category candidates; inspect
+Run tome-inventory.mjs --project . for bounded file/category candidates; inspect
 truncation and omitted areas. Limits never imply a complete scan. No AST extractor
 is provided.
 

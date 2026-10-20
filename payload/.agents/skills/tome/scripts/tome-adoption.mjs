@@ -5,21 +5,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
-import { parseExactJson } from './accord-contracts.mjs';
+import { parseExactJson } from './tome-contracts.mjs';
 
 const HASH = /^[a-f0-9]{64}$/;
 const REVISION = /^[a-f0-9]{40}$/;
 const VERSION = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const OFFICIAL = 'https://github.com/khuang9104/Project-Tome';
-const LEGACY_IDENTITIES = new Map([
-  ['agentic-accord', 'https://github.com/khuang9104/Agentic-Accord'],
-  ['agentic-coding-accord', 'https://github.com/khuang9104/Agentic-Coding-Accord']
-]);
-const knownRepository = value => value === OFFICIAL || [...LEGACY_IDENTITIES.values()].includes(value);
-const releaseIdentity = (value, legacy = false) => Boolean(value && (
-  value.id === 'project-tome' && value.source_repository === OFFICIAL ||
-  legacy && LEGACY_IDENTITIES.has(value.id) && LEGACY_IDENTITIES.get(value.id) === value.source_repository
-));
+const releaseIdentity = value => value?.id === 'project-tome' && value.source_repository === OFFICIAL;
 const LIMITS = { files: 4096, fileBytes: 16 * 1024 * 1024, totalBytes: 128 * 1024 * 1024 };
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
@@ -27,8 +19,8 @@ const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 const parse = parseExactJson;
 const normalizedText = value => value.replace(/\r\n/g, '\n');
 const ABSENT = Symbol('absent');
-export const INSTALLATION_RECORD = '.accord/installation.json';
-const textPath = relative => /\.(?:md|mjs|js|json|ya?ml|txt|sha256)$|(?:^|\/)(?:LICENSE|ACCORD-LICENSE|pre-commit)$/.test(relative);
+export const INSTALLATION_RECORD = '.tome/installation.json';
+const textPath = relative => /\.(?:md|mjs|js|json|ya?ml|txt|sha256)$|(?:^|\/)(?:LICENSE|TOME-LICENSE|pre-commit)$/.test(relative);
 function lfDigest(content, relative) {
   if (!textPath(relative) || content.includes(0)) return undefined;
   const text = content.toString('utf8');
@@ -45,7 +37,7 @@ function compareVersion(left, right) {
   return 0;
 }
 function versionTransition(from, to) {
-  if (!from) return { state: 'legacy-or-initial', requires_decision: false };
+  if (!from) return { state: 'initial', requires_decision: false };
   const comparison = compareVersion(from, to);
   if (comparison === null) return { state: 'unknown', requires_decision: true };
   if (comparison < 0) return { state: 'upgrade', requires_decision: false };
@@ -104,33 +96,29 @@ function packageFiles(root, directory, output = [], budget = { entries: 0 }, dep
   return output;
 }
 
-export function installationTarget(sourcePath, { migrationSource = false } = {}) {
+export function installationTarget(sourcePath) {
   relativePath(sourcePath);
   if (!sourcePath.startsWith('payload/')) throw new Error('Only payload files can become installation targets.');
   const relative = sourcePath.slice(8);
-  if (!migrationSource && (relative.startsWith('.accord/capabilities/') || relative === '.accord/governance.yaml')) throw new Error('Retired default payload destination: ' + relative);
-  if (migrationSource && ['.accord/changes/.gitkeep', '.accord/records/.gitkeep'].includes(relative)) return { path: relative, policy: 'project-owned' };
-  if (relative === 'AGENTS.accord-block.md') return { path: 'AGENTS.md', policy: 'managed-block', block: 'accord' };
-  if (relative === 'copilot-instructions.accord.md') return { path: '.github/copilot-instructions.md', policy: 'managed-block', block: 'accord:copilot' };
-  if (relative.startsWith('.agents/skills/accord/')) return { path: relative, policy: 'runtime' };
-  if (['.accord/accord.yaml', '.accord/capabilities/routes.yaml', '.accord/documentation-policy.yaml', '.accord/governance.yaml'].includes(relative)) return { path: relative, policy: 'merge-json' };
-  if (relative === '.accord/hooks/pre-commit') return { path: relative, policy: 'runtime' };
-  if (relative === '.accord/release.json') return { path: relative, policy: 'runtime' };
-  if (relative === '.accord/capabilities/registry.yaml' || relative.startsWith('docs/')) return { path: relative, policy: 'project-owned' };
-  if (relative.startsWith('.accord/capabilities/methods/')) throw new Error('Project-specific methods must not ship in the default payload.');
-  if (relative.startsWith('.accord/capabilities/')) return { path: relative, policy: 'runtime' };
-  if (relative === 'ACCORD-LICENSE') return { path: relative, policy: 'runtime' };
+  if (relative === 'AGENTS.tome-block.md') return { path: 'AGENTS.md', policy: 'managed-block', block: 'tome' };
+  if (relative === 'copilot-instructions.tome.md') return { path: '.github/copilot-instructions.md', policy: 'managed-block', block: 'tome:copilot' };
+  if (relative.startsWith('.agents/skills/tome/')) return { path: relative, policy: 'runtime' };
+  if (['.tome/tome.yaml', '.tome/documentation-policy.yaml'].includes(relative)) return { path: relative, policy: 'merge-json' };
+  if (relative === '.tome/hooks/pre-commit') return { path: relative, policy: 'runtime' };
+  if (relative === '.tome/release.json') return { path: relative, policy: 'runtime' };
+  if (relative.startsWith('docs/')) return { path: relative, policy: 'project-owned' };
+  if (relative === 'TOME-LICENSE') return { path: relative, policy: 'runtime' };
   throw new Error('Unregistered payload destination: ' + relative);
 }
 
-export function verifyReleasePackage(rootInput, { migrationSource = false } = {}) {
+export function verifyReleasePackage(rootInput) {
   const root = fs.realpathSync(rootInput);
   const manifest = bytes(root, 'SHA256SUMS');
   const entries = [];
   const seen = new Set();
   let total = 0;
   for (const line of manifest.toString('utf8').split(/\r?\n/).filter(Boolean)) {
-    const match = line.match(/^([a-f0-9]{64})  (RELEASE\.json|(?:payload|vendor)\/.+)$/);
+    const match = line.match(/^([a-f0-9]{64})  (RELEASE\.json|payload\/.+)$/);
     if (!match) throw new Error('Invalid SHA256SUMS entry.');
     const [, sha256, relative] = match;
     relativePath(relative);
@@ -140,45 +128,32 @@ export function verifyReleasePackage(rootInput, { migrationSource = false } = {}
     total += content.length;
     if (total > LIMITS.totalBytes) throw new Error('Package byte budget exceeded.');
     if (digest(content) !== sha256) throw new Error('Package checksum mismatch: ' + relative);
-    if (relative.startsWith('payload/')) installationTarget(relative, { migrationSource });
+    if (relative.startsWith('payload/')) installationTarget(relative);
     entries.push({ source_path: relative, sha256 });
   }
-  const metadata = bytes(root, 'RELEASE.json', true);
-  const actual = [...(metadata ? ['RELEASE.json'] : []), ...packageFiles(root, 'payload'), ...packageFiles(root, 'vendor')];
+  const metadata = bytes(root, 'RELEASE.json');
+  const actual = ['RELEASE.json', ...packageFiles(root, 'payload'), ...packageFiles(root, 'vendor')];
   if (actual.length !== entries.length || actual.some(file => !seen.has(file.toLowerCase()))) throw new Error('Package has missing or unlisted files.');
-  const config = parse(bytes(root, 'payload/.accord/accord.yaml').toString('utf8'));
-  const payloadMetadata = bytes(root, 'payload/.accord/release.json', true);
-  const legacy = migrationSource && !metadata && !payloadMetadata && config.accord?.release === undefined;
-  const release = metadata ? parse(metadata.toString('utf8')) : null;
-  if (!legacy && (!object(release) || !payloadMetadata || !sameFile(metadata, payloadMetadata, 'RELEASE.json') ||
-      release.schema_version !== '1.0' || !releaseIdentity(release, migrationSource) ||
+  const config = parse(bytes(root, 'payload/.tome/tome.yaml').toString('utf8'));
+  const payloadMetadata = bytes(root, 'payload/.tome/release.json', true);
+  const release = parse(metadata.toString('utf8'));
+  if (!object(release) || !payloadMetadata || !sameFile(metadata, payloadMetadata, 'RELEASE.json') ||
+      release.schema_version !== '1.0' || !releaseIdentity(release) ||
       !VERSION.test(release.release_version || '') ||
       !VERSION.test(release.protocol_version || '') ||
-      release.payload_release_path !== '.accord/release.json' ||
-      release.checksum_manifest !== 'SHA256SUMS' || release.update_contract !== 'accord-adoption-v1' ||
-      config.accord?.release !== release.release_version || config.accord?.version !== release.protocol_version)) {
+      release.payload_release_path !== '.tome/release.json' ||
+      release.checksum_manifest !== 'SHA256SUMS' || release.update_contract !== 'tome-adoption-v1' ||
+      config.tome?.release !== release.release_version || config.tome?.version !== release.protocol_version) {
     throw new Error('Release metadata is missing, invalid or inconsistent with the payload.');
   }
   const knowledge = parse(bytes(root, 'payload/docs/manifest.yaml').toString('utf8'));
-  const registryBytes = bytes(root, 'payload/.accord/capabilities/registry.yaml', true);
-  const registry = registryBytes ? parse(registryBytes.toString('utf8')) : null;
   const empty = value => Array.isArray(value) && value.length === 0;
-  if (!migrationSource && (knowledge.schema_version !== '2.0' || config.schema_version !== '1.0' || config.sources?.engineering !== undefined)) throw new Error('Incoming package must use current schemas; retired formats are import-only.');
-  const engineering = migrationSource ? knowledge.engineering : null;
-  const pristineKnowledge = knowledge.schema_version === '2.0'
-    ? empty(knowledge.module_files) && Array.isArray(knowledge.documents) && knowledge.documents.every(d => d.status === 'draft' && d.review === undefined)
-    : knowledge.observed_revision === null && knowledge.last_reviewed_at === null &&
-      knowledge.observed_at === null && knowledge.observed_worktree === 'unknown' &&
-      knowledge.source_content_included === false && empty(knowledge.modules) && empty(knowledge.known_gaps);
+  if (knowledge.schema_version !== '2.0' || config.schema_version !== '1.0' || config.sources?.engineering !== undefined) throw new Error('Incoming package must use current Project Tome schemas.');
+  const pristineKnowledge = empty(knowledge.module_files) && Array.isArray(knowledge.documents) && knowledge.documents.every(d => d.status === 'draft' && d.review === undefined);
   if (config.project?.id !== 'replace-with-project-id' ||
       (config.sources?.engineering !== undefined && !empty(config.sources.engineering)) ||
-      knowledge.status !== 'draft' || !pristineKnowledge ||
-      (engineering && (!empty(engineering.contracts) || !empty(engineering.documents) ||
-        engineering.coverage?.status !== 'not-assessed' || engineering.coverage?.inventory_complete !== false ||
-        !empty(engineering.coverage?.scope) || !empty(engineering.coverage?.inventory) || !empty(engineering.coverage?.gaps) ||
-        engineering.reconstruction?.status !== 'not-run' || !empty(engineering.reconstruction?.scope) || !empty(engineering.reconstruction?.evidence))) ||
-      (registry && (!Array.isArray(registry.installed) || registry.installed.length || (registry.methods !== undefined && !empty(registry.methods))))) {
-    throw new Error('Source contains project identity, knowledge or capability state; use a clean distribution, not another adopted project.');
+      knowledge.status !== 'draft' || !pristineKnowledge) {
+    throw new Error('Source contains project identity or knowledge state; use a clean distribution, not another adopted project.');
   }
   return { root, package_sha256: digest(manifest), files: entries, config, release,
     limitation: 'Checksums verify this file set, not publisher identity, human approval or executable safety.' };
@@ -226,7 +201,7 @@ function block(text, name) {
   return { start, end, text: text.slice(start, end) };
 }
 
-export function mergeManagedEntry(local, incoming, previous, name = 'accord') {
+export function mergeManagedEntry(local, incoming, previous, name = 'tome') {
   const next = block(incoming, name);
   if (!next) throw new Error('Package managed entry block is missing.');
   const current = block(local, name);
@@ -240,24 +215,23 @@ export function mergeManagedEntry(local, incoming, previous, name = 'accord') {
   return { action: 'conflict', content: local, reason: 'Managed block differs locally; inspect the three-way diff before editing.' };
 }
 
-function recordPathPolicy(entry, migrationSource = false) {
-  const target = installationTarget(entry.source_path, { migrationSource });
+function recordPathPolicy(entry) {
+  const target = installationTarget(entry.source_path);
   if (target.path !== entry.path || target.policy !== entry.policy || !HASH.test(entry.source_sha256 || '') ||
       (entry.source_lf_sha256 !== undefined && (!HASH.test(entry.source_lf_sha256) || !textPath(entry.path) || target.policy !== 'runtime'))) throw new Error('Installation record has an invalid owner or source hash.');
   return target;
 }
 
-export function validateInstallationRecord(projectRoot, record, projectId, { migrationSource = false } = {}) {
+export function validateInstallationRecord(projectRoot, record, projectId) {
   const errors = [];
   const warnings = [];
   const structuralErrors = [];
   const drift = [];
-  const importingReceiptV1 = migrationSource && record?.schema_version === '1.0';
   const result = () => ({ errors: [...structuralErrors, ...errors], warnings, structural_errors: structuralErrors, drift });
-  if (!object(record) || !(record.schema_version === '1.1' || (migrationSource && record.schema_version === '1.0')) || typeof projectId !== 'string' || !projectId.trim() || projectId === 'replace-with-project-id' || record.project_id !== projectId ||
-      !knownRepository(record.source?.repository) || !REVISION.test(record.source?.revision || '') ||
+  if (!object(record) || record.schema_version !== '1.1' || typeof projectId !== 'string' || !projectId.trim() || projectId === 'replace-with-project-id' || record.project_id !== projectId ||
+      record.source?.repository !== OFFICIAL || !REVISION.test(record.source?.revision || '') ||
       !HASH.test(record.source?.package_sha256 || '') || !['clean', 'dirty', 'unknown'].includes(record.source?.worktree) ||
-      !object(record.protocol) || (!VERSION.test(record.protocol.release || '') && !(importingReceiptV1 && record.protocol.release === undefined)) ||
+      !object(record.protocol) || !VERSION.test(record.protocol.release || '') ||
       ['version', 'configuration', 'knowledge'].some(key => typeof record.protocol[key] !== 'string' || !record.protocol[key]) ||
       !Array.isArray(record.files) || !record.files.length || record.files.length > LIMITS.files ||
       !Array.isArray(record.local_changes) || record.local_changes.length > LIMITS.files) {
@@ -277,14 +251,14 @@ export function validateInstallationRecord(projectRoot, record, projectId, { mig
   const owners = [];
   for (const entry of record.files) {
     try {
-      const target = recordPathPolicy(entry, migrationSource);
+      const target = recordPathPolicy(entry);
       if (seen.has(entry.path.toLowerCase())) throw new Error('Duplicate installation owner.');
       seen.add(entry.path.toLowerCase());
       if (local.has(entry.path.toLowerCase()) && local.get(entry.path.toLowerCase()).path !== entry.path) throw new Error('Local customization path must exactly match its owner.');
       owners.push({ entry, target });
     } catch (error) { structuralErrors.push(error.message); }
   }
-  for (const required of ['AGENTS.md', '.github/copilot-instructions.md', '.accord/accord.yaml', '.agents/skills/accord/SKILL.md', '.agents/skills/accord/scripts/accord-validate.mjs', ...(!importingReceiptV1 ? ['.accord/release.json'] : [])]) {
+  for (const required of ['AGENTS.md', '.github/copilot-instructions.md', '.tome/tome.yaml', '.agents/skills/tome/SKILL.md', '.agents/skills/tome/scripts/tome-validate.mjs', '.tome/release.json']) {
     if (!seen.has(required.toLowerCase())) structuralErrors.push('Installation record omits a required owner: ' + required);
   }
   for (const change of local.values()) if (!seen.has(change.path.toLowerCase())) structuralErrors.push('Local change has no installed owner: ' + change.path);
@@ -325,29 +299,29 @@ export function inspectInstallation(projectRoot, config) {
   const warnings = [];
   const paths = [];
   try {
-    const content = bytes(projectRoot, '.accord/release.json', true);
+    const content = bytes(projectRoot, '.tome/release.json', true);
     if (content) {
-      paths.push('.accord/release.json');
+      paths.push('.tome/release.json');
       const metadata = parse(content.toString('utf8'));
-      if (metadata?.schema_version !== '1.0' || !releaseIdentity(metadata, true) ||
+      if (metadata?.schema_version !== '1.0' || !releaseIdentity(metadata) ||
           !VERSION.test(metadata?.release_version || '') || !VERSION.test(metadata?.protocol_version || '') ||
-          metadata?.payload_release_path !== '.accord/release.json' ||
-          metadata?.checksum_manifest !== 'SHA256SUMS' || metadata?.update_contract !== 'accord-adoption-v1') {
+          metadata?.payload_release_path !== '.tome/release.json' ||
+          metadata?.checksum_manifest !== 'SHA256SUMS' || metadata?.update_contract !== 'tome-adoption-v1') {
         errors.push('Invalid installed release metadata identity or update contract.');
       }
-      if (metadata?.release_version !== config?.accord?.release || metadata?.protocol_version !== config?.accord?.version) errors.push('Configuration and release metadata versions do not match.');
-    } else if (config?.accord?.release !== undefined) errors.push('Missing installed release metadata: .accord/release.json.');
-    else errors.push('Release metadata is required; complete migration.');
+      if (metadata?.release_version !== config?.tome?.release || metadata?.protocol_version !== config?.tome?.version) errors.push('Configuration and release metadata versions do not match.');
+    } else if (config?.tome?.release !== undefined) errors.push('Missing installed release metadata: .tome/release.json.');
+    else errors.push('Release metadata is required; complete Project Tome adoption.');
   } catch (error) { errors.push('Release metadata: ' + error.message); }
-  const configured = config?.accord?.installation_record;
+  const configured = config?.tome?.installation_record;
   if (configured !== undefined && configured !== INSTALLATION_RECORD) {
-    return { errors: ['accord.installation_record must be ' + INSTALLATION_RECORD + '.'], warnings, paths };
+    return { errors: ['tome.installation_record must be ' + INSTALLATION_RECORD + '.'], warnings, paths };
   }
   try {
     const content = bytes(projectRoot, INSTALLATION_RECORD, true);
     if (!content) {
       if (configured) errors.push('Missing installation record: ' + INSTALLATION_RECORD + '. Complete the reviewed adoption; do not invent an old baseline.');
-      else errors.push('Installation receipt is required; complete migration.');
+      else errors.push('Installation receipt is required; complete Project Tome adoption.');
       return { errors, warnings, paths };
     }
     paths.push(INSTALLATION_RECORD);
@@ -355,10 +329,10 @@ export function inspectInstallation(projectRoot, config) {
     const checked = validateInstallationRecord(projectRoot, record, config?.project?.id);
     errors.push(...checked.errors);
     warnings.push(...checked.warnings);
-    if (!checked.structural_errors.length && (record.protocol.release !== config?.accord?.release ||
-        record.protocol.version !== config?.accord?.version ||
+    if (!checked.structural_errors.length && (record.protocol.release !== config?.tome?.release ||
+        record.protocol.version !== config?.tome?.version ||
         record.protocol.configuration !== config?.schema_version || record.protocol.knowledge !== config?.knowledge_base?.structure_version)) {
-      errors.push('Installation protocol versions do not match project configuration; review the migration and installation record together.');
+      errors.push('Installation protocol versions do not match project configuration; review the current configuration and installation record together.');
     }
   } catch (error) { errors.push('Installation record: ' + error.message); }
   return { errors, warnings, paths };
@@ -366,7 +340,7 @@ export function inspectInstallation(projectRoot, config) {
 
 export function planAdoption(projectRoot, packageRoot, { previousPackageRoot } = {}) {
   const incoming = verifyReleasePackage(packageRoot);
-  const previous = previousPackageRoot ? verifyReleasePackage(previousPackageRoot, { migrationSource: true }) : null;
+  const previous = previousPackageRoot ? verifyReleasePackage(previousPackageRoot) : null;
   const oldFiles = new Set(previous?.files.map(entry => entry.source_path) || []);
   const actions = [];
   const seenTargets = new Set();
@@ -374,8 +348,8 @@ export function planAdoption(projectRoot, packageRoot, { previousPackageRoot } =
   const record = priorRecord ? parse(priorRecord.toString('utf8')) : null;
   let installationIssues = [];
   if (record) {
-    const localConfig = parse(bytes(projectRoot, '.accord/accord.yaml').toString('utf8'));
-    const checked = validateInstallationRecord(projectRoot, record, localConfig.project?.id, { migrationSource: true });
+    const localConfig = parse(bytes(projectRoot, '.tome/tome.yaml').toString('utf8'));
+    const checked = validateInstallationRecord(projectRoot, record, localConfig.project?.id);
     if (checked.structural_errors.length) throw new Error('Existing installation record requires reconciliation: ' + checked.structural_errors.join('; '));
     installationIssues = checked.drift;
     if (previous && previous.package_sha256 !== record.source.package_sha256) throw new Error('The previous package does not match the installation record; do not use it as a three-way baseline.');
@@ -422,12 +396,12 @@ export function planAdoption(projectRoot, packageRoot, { previousPackageRoot } =
     actions.push({ ...target, source_path: entry.source_path, ...action });
   }
   for (const entry of recorded.values()) {
-    recordPathPolicy(entry, true);
+    recordPathPolicy(entry);
     if (!seenTargets.has(entry.path)) actions.push({ path: entry.path, policy: entry.policy, action: 'review-retirement', reason: 'No longer in the package; no deletion is authorized by this plan.' });
   }
   const version = versionTransition(record?.protocol?.release, incoming.release.release_version);
   return { schema_version: '1.0', mode: record ? 'existing-project' :
-    fs.existsSync(path.join(projectRoot, '.accord')) || fs.existsSync(path.join(projectRoot, '.agents/skills/accord')) ? 'partial-or-legacy' : 'initial',
+    fs.existsSync(path.join(projectRoot, '.tome')) || fs.existsSync(path.join(projectRoot, '.agents/skills/tome')) ? 'partial' : 'initial',
     from_release: record?.protocol?.release ?? null, to_release: incoming.release.release_version,
     version_transition: version.state, version_decision_required: version.requires_decision,
     previous_package_sha256: record?.source?.package_sha256 ?? null,
@@ -437,7 +411,7 @@ export function planAdoption(projectRoot, packageRoot, { previousPackageRoot } =
 
 export function createInstallationRecord(projectRoot, packageRoot, source, localChanges = []) {
   const pkg = verifyReleasePackage(packageRoot);
-  const config = parse(bytes(projectRoot, '.accord/accord.yaml').toString('utf8'));
+  const config = parse(bytes(projectRoot, '.tome/tome.yaml').toString('utf8'));
   if (source?.repository !== OFFICIAL || !REVISION.test(source?.revision || '') || !['clean', 'dirty', 'unknown'].includes(source?.worktree)) throw new Error('Record requires official source, observed full revision and worktree state; do not invent missing provenance.');
   const files = pkg.files.filter(entry => entry.source_path.startsWith('payload/')).map(entry => {
     const target = installationTarget(entry.source_path);
@@ -447,10 +421,10 @@ export function createInstallationRecord(projectRoot, packageRoot, source, local
     return { path: target.path, policy: target.policy, source_path: entry.source_path, source_sha256: sourceHash,
       ...(sourceLfHash === undefined ? {} : { source_lf_sha256: sourceLfHash }) };
   });
-  if (config.accord?.release !== pkg.release.release_version || config.accord?.version !== pkg.release.protocol_version) throw new Error('Project configuration release/protocol does not match the requested Release; finish the merge before recording.');
+  if (config.tome?.release !== pkg.release.release_version || config.tome?.version !== pkg.release.protocol_version) throw new Error('Project configuration release/protocol does not match the requested Release; finish the merge before recording.');
   const record = { schema_version: '1.1', project_id: config.project?.id,
     source: { ...source, package_sha256: pkg.package_sha256 },
-    protocol: { release: pkg.release.release_version, version: pkg.config.accord.version, configuration: config.schema_version, knowledge: config.knowledge_base?.structure_version },
+    protocol: { release: pkg.release.release_version, version: pkg.config.tome.version, configuration: config.schema_version, knowledge: config.knowledge_base?.structure_version },
     files, local_changes: localChanges };
   const validation = validateInstallationRecord(projectRoot, record, config.project?.id);
   if (validation.errors.length) throw new Error(validation.errors.join('\n'));
@@ -468,7 +442,7 @@ export function verifyInstalledPackage(projectRoot, packageRoot, { revision } = 
   let config;
   let record;
   try {
-    config = parse(bytes(projectRoot, '.accord/accord.yaml').toString('utf8'));
+    config = parse(bytes(projectRoot, '.tome/tome.yaml').toString('utf8'));
     if (!object(config)) throw new Error('Expected a configuration object.');
   } catch (error) {
     errors.push('Installed project configuration is missing or invalid: ' + error.message);
@@ -519,7 +493,7 @@ export function verifyInstalledPackage(projectRoot, packageRoot, { revision } = 
     source_revision: record?.source?.revision ?? null,
     local_changes: record?.local_changes ?? [],
     errors,
-    limitation: 'File conformance with declared local exceptions only. Run the requested Release validator and resolve every plan action, including configuration migrations and retirements. Not publisher authentication or acceptance.'
+    limitation: 'File conformance with declared local exceptions only. Run the requested Release validator and resolve every plan action, including configuration updates and retirements. Not publisher authentication or acceptance.'
   };
 }
 
@@ -535,12 +509,12 @@ export function main(args) {
   if ((mode !== 'status' && !values['--package']) || (mode !== 'verify-package' && !values['--project'])) throw new Error('Package and, for target operations, project are required (status needs only project).');
   let result;
   if (mode === 'status') {
-    const config = parse(bytes(values['--project'], '.accord/accord.yaml').toString('utf8'));
+    const config = parse(bytes(values['--project'], '.tome/tome.yaml').toString('utf8'));
     const checked = inspectInstallation(values['--project'], config);
     const content = bytes(values['--project'], INSTALLATION_RECORD, true);
     const record = content ? parse(content.toString('utf8')) : null;
-    result = { valid: !checked.errors.length, release_version: config.accord?.release ?? null,
-      protocol_version: config.accord?.version ?? null, record_schema: record?.schema_version ?? null,
+    result = { valid: !checked.errors.length, release_version: config.tome?.release ?? null,
+      protocol_version: config.tome?.version ?? null, record_schema: record?.schema_version ?? null,
       source_revision: record?.source?.revision ?? null, package_sha256: record?.source?.package_sha256 ?? null,
       errors: checked.errors, warnings: checked.warnings,
       limitation: 'Local declared state only; does not establish completeness against a requested package or check GitHub for updates.' };

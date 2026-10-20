@@ -1,5 +1,5 @@
 ---
-name: accord
+name: tome
 description: Maintain durable project intent and searchable architecture, module, interface and data knowledge while coding with an Agent. Use for onboarding, resuming work, recording decisions, knowledge queries and incremental pre-commit documentation. Skip unrelated questions.
 ---
 
@@ -13,7 +13,7 @@ Code establishes observed behavior, not the user's intended goal.
 ## Start with relevant context
 
 Read the installed configuration and manifest, then the closest intent and module
-owners. Use accord-project.mjs --project . --query "terms" or --modules IDs to
+owners. Use tome-project.mjs --project . --query "terms" or --modules IDs to
 select context; read those owners and relevant code. Follow refs for necessary
 context and inspect gaps before relying on claims. Do not load the whole knowledge
 base on every task. In the Project Tome source repository use its AGENTS.md and canonical
@@ -52,7 +52,7 @@ Commits and external actions follow user authorization and native project rules.
 
 ## Other operations
 
-- Adoption, upgrade and migration: [adoption-and-update.md](references/adoption-and-update.md).
+- Adoption and updates: [adoption-and-update.md](references/adoption-and-update.md).
 - Query or targeted refresh: [knowledge-query-and-refresh.md](references/knowledge-query-and-refresh.md).
 - Writing and ownership: [documentation-writing.md](references/documentation-writing.md).
 - Optional source-free handoff: [knowledge-delivery.md](references/knowledge-delivery.md).

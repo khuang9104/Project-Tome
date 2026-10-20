@@ -7,10 +7,10 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { loadProjectModel, createPublicationManifest } from './accord-project.mjs';
+import { loadProjectModel, createPublicationManifest } from './tome-project.mjs';
 
 const BLOCKED_TOP_LEVEL = new Set([
-  '.git', '.accord', '.agents', 'vendor', 'node_modules',
+  '.git', '.tome', '.agents', 'vendor', 'node_modules',
   'dist', 'build', 'out', 'target', 'coverage'
 ].map(value => value.toLowerCase()));
 const SOURCE_EXTENSIONS = new Set([
@@ -118,7 +118,7 @@ export function selectKnowledgeFiles({ manifest, config = {}, mode = 'query', mo
     publication.omitted = omitted;
     return { mode, scope: publication.selected_modules, selected, omitted, publication };
   }
-  throw new Error('Migrate knowledge to 2.0 before export.');
+  throw new Error('Only Project Tome knowledge schema 2.0 is supported for export.');
 }
 
 function hashFile(file) {
@@ -221,7 +221,7 @@ export function exportKnowledgeDelivery({ projectRoot: projectInput, outputRoot:
   const delivery = {
     schema_version: '1.0',
     selected_modules: selection.scope,
-    structure: 'accord-knowledge-delivery',
+    structure: 'tome-knowledge-delivery',
     mode,
     source_free: true,
     source_content_included: false,
@@ -270,7 +270,7 @@ export function verifyKnowledgeDelivery(input) {
   const root = fs.realpathSync(path.resolve(input || ''));
   const receiptPath = path.join(root, 'delivery.json');
   const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'));
-  if (receipt.schema_version !== '1.0' || receipt.structure !== 'accord-knowledge-delivery' ||
+  if (receipt.schema_version !== '1.0' || receipt.structure !== 'tome-knowledge-delivery' ||
       receipt.source_free !== true || receipt.source_content_included !== false || !Array.isArray(receipt.files)) {
     throw new Error('Delivery receipt has an invalid source-free structure.');
   }
@@ -337,9 +337,9 @@ function parseArgs(argv) {
 function main() {
   const parsed = parseArgs(process.argv.slice(2));
   if (parsed.help) {
-    console.log('Usage: node accord-knowledge-export.mjs --project <path> --mode <query> --output <directory> [--modules <id,id>] [--dry-run]');
+    console.log('Usage: node tome-knowledge-export.mjs --project <path> --mode <query> --output <directory> [--modules <id,id>] [--dry-run]');
     console.log('  Create a bounded source-free knowledge delivery set outside the project.');
-    console.log('Usage: node accord-knowledge-export.mjs --verify <delivery-directory>');
+    console.log('Usage: node tome-knowledge-export.mjs --verify <delivery-directory>');
     console.log('  Verify the delivery receipt, hashes, file set and source-free paths.');
     return;
   }
@@ -356,7 +356,7 @@ function main() {
     }
     const projectRoot = path.resolve(parsed.project);
     const manifestPath = path.join(projectRoot, 'docs', 'manifest.yaml');
-    const configPath = path.join(projectRoot, '.accord', 'accord.yaml');
+    const configPath = path.join(projectRoot, '.tome', 'tome.yaml');
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     const config = fs.existsSync(configPath) ? JSON.parse(fs.readFileSync(configPath, 'utf8')) : {};
     const result = exportKnowledgeDelivery({ projectRoot, outputRoot: parsed.output, manifest, config, mode: parsed.mode, dryRun: parsed.dryRun, modules: parsed.modules });

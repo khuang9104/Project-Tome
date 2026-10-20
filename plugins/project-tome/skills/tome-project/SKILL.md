@@ -1,5 +1,5 @@
 ---
-name: accord-project
+name: tome-project
 description: Set up Project Tome in a project, inspect its installed version, or update its project intent and implementation knowledge workflow. Use when the user asks to adopt, configure, check or upgrade Project Tome; everyday development uses the project's installed Project Tome skill.
 ---
 
@@ -13,13 +13,13 @@ plugin does not initialize or update any project.
 ## Inspect the request
 
 Identify the target project from the user's workspace, not this plugin's cache.
-For a version/status question, inspect the target's `.accord/installation.json`
-and `.accord/release.json`. If available, use its installed read-only
-`accord-adoption.mjs --mode status --project <target>`. Report missing or partial
+For a version/status question, inspect the target's `.tome/installation.json`
+and `.tome/release.json`. If available, use its installed read-only
+`tome-adoption.mjs --mode status --project <target>`. Report missing or partial
 installation. A status request neither fetches a release nor authorizes writes.
 
 For ordinary development in an adopted project, read its Agent entry files and
-`.agents/skills/accord/SKILL.md`; follow its configured knowledge workflow.
+`.agents/skills/tome/SKILL.md`; follow its configured knowledge workflow.
 Do not introduce a second requirements, documentation or approval system.
 
 ## Select one distribution
@@ -38,7 +38,7 @@ the SHA-256 of `SHA256SUMS` against the lock before running package code. Read
 scripts. Check the complete package using its read-only command:
 
 ```text
-node <source>/payload/.agents/skills/accord/scripts/accord-adoption.mjs --mode verify-package --package <source>
+node <source>/payload/.agents/skills/tome/scripts/tome-adoption.mjs --mode verify-package --package <source>
 ```
 
 Replace placeholders with inspected, quoted absolute paths. Compare the returned
@@ -82,6 +82,5 @@ The framework and this plugin lock are committed separately: verify the committe
 distribution first, then generate its exact lock. An explicit local package selection
 reports its observed revision and dirty state; never invent a new commit lock.
 
-Repository renaming retains the same GitHub repository ID. The lock keeps its
-original revision, package digest and source_repository_at_revision; only its
-current repository URL changes. Historical release identity remains historical.
+Only current Project Tome identities, `.tome` paths and schemas are supported.
+There is no old-name alias or automatic migration adapter.

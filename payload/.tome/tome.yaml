@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "accord": {
+  "tome": {
     "version": "0.12.0",
     "release": "0.12.0",
     "installation": "vendored",
-    "installation_record": ".accord/installation.json"
+    "installation_record": ".tome/installation.json"
   },
   "project": {
     "id": "replace-with-project-id",
@@ -44,6 +44,6 @@
     }
   },
   "documentation": {
-    "policy": ".accord/documentation-policy.yaml"
+    "policy": ".tome/documentation-policy.yaml"
   }
 }

@@ -2,15 +2,15 @@
 // Read-only validation. Never executes project code or tests.
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { inspectInstallation } from './accord-adoption.mjs';
-import { CONFIG_SCHEMA, PROTOCOL_VERSION, KNOWLEDGE_SCHEMA, RETIRED_CONFIG_FIELDS, VALIDATION_SCOPES } from './accord-protocol.mjs';
-import { loadProjectModel, validateProjectKnowledge, readJson, relativePath, owns, sourceOwner, moduleClosure, strings } from './accord-project.mjs';
-import { stagedChanges } from './accord-scope.mjs';
+import { inspectInstallation } from './tome-adoption.mjs';
+import { CONFIG_SCHEMA, PROTOCOL_VERSION, KNOWLEDGE_SCHEMA, RETIRED_CONFIG_FIELDS, VALIDATION_SCOPES } from './tome-protocol.mjs';
+import { loadProjectModel, validateProjectKnowledge, readJson, relativePath, owns, sourceOwner, moduleClosure, strings } from './tome-project.mjs';
+import { stagedChanges } from './tome-scope.mjs';
 
 export function verifyConfiguration(config, errors = []) {
-  if (config?.schema_version !== CONFIG_SCHEMA) errors.push('Migrate configuration to schema ' + CONFIG_SCHEMA + '.');
-  if (config?.accord?.version !== PROTOCOL_VERSION) errors.push('Expected accord.version ' + PROTOCOL_VERSION + '.');
-  if (!/^\d+\.\d+\.\d+$/.test(config?.accord?.release || '')) errors.push('Expected a semantic release version.');
+  if (config?.schema_version !== CONFIG_SCHEMA) errors.push('Expected Project Tome configuration schema ' + CONFIG_SCHEMA + '.');
+  if (config?.tome?.version !== PROTOCOL_VERSION) errors.push('Expected tome.version ' + PROTOCOL_VERSION + '.');
+  if (!/^\d+\.\d+\.\d+$/.test(config?.tome?.release || '')) errors.push('Expected a semantic release version.');
   if (typeof config?.project?.id !== 'string' || !config.project.id.trim()) errors.push('Project identity is required.');
   if (config?.repository?.vcs !== 'git' || config.repository.offline_capable !== true) errors.push('Project Tome requires local Git and offline operation.');
   if (config?.knowledge_base?.structure_version !== KNOWLEDGE_SCHEMA || config.knowledge_base.refresh_policy !== 'change-impact') errors.push('Knowledge requires schema 2.0 and change-impact maintenance.');
@@ -22,7 +22,7 @@ export function verifyConfiguration(config, errors = []) {
 export function inspectCommit(root, { modules = [] } = {}) {
   if (!strings(modules)) throw new Error('Modules must be distinct IDs.');
   const before = stagedChanges(root), view = { staged: true };
-  const config = readJson(root, '.accord/accord.yaml', view), errors = verifyConfiguration(config);
+  const config = readJson(root, '.tome/tome.yaml', view), errors = verifyConfiguration(config);
   if (errors.length) return { errors, gaps: [], status: 'blocked' };
   const model = loadProjectModel(root, config, null, view), direct = new Set(), documents = new Set(), unmapped = [];
   for (const change of before.changes) for (const file of [...new Set([change.before, change.path].filter(Boolean))]) {
@@ -39,7 +39,7 @@ export function inspectCommit(root, { modules = [] } = {}) {
   // Compare declarations as well as files, preventing stale review refreshes in metadata.
   if (before.base_revision) {
     let previous;
-    try { previous = loadProjectModel(root, null, null, { revision: before.base_revision }); } catch { /* First migration uses the new registry. */ }
+    try { previous = loadProjectModel(root, null, null, { revision: before.base_revision }); } catch { /* First adoption has no previous Tome registry. */ }
     if (previous) {
       for (const d of model.documents) if (d.status !== 'retired' && (!d.module || model.modules.find(m => m.id === d.module)?.status === 'current' || direct.has(d.module)) && JSON.stringify(previous.documents.find(p => p.id === d.id)) !== JSON.stringify(d)) { documents.add(d.id); if (d.module) direct.add(d.module); }
       for (const m of model.modules) if (m.status === 'current' && JSON.stringify(previous.modules.find(p => p.id === m.id)) !== JSON.stringify(m)) direct.add(m.id);
@@ -62,7 +62,7 @@ export function validateProject(root, options = {}) {
   const scope = options.scope || 'audit';
   if (!VALIDATION_SCOPES.has(scope)) throw new Error('Unknown validation scope: ' + scope);
   if (scope === 'commit') return inspectCommit(root, options);
-  const config = readJson(root, '.accord/accord.yaml'), errors = verifyConfiguration(config), warnings = [];
+  const config = readJson(root, '.tome/tome.yaml'), errors = verifyConfiguration(config), warnings = [];
   if (errors.length) return { status: 'blocked', errors, warnings };
   if (scope === 'installation' || scope === 'audit') { const r = inspectInstallation(root, config); errors.push(...r.errors); warnings.push(...r.warnings); }
   let knowledge;
@@ -75,7 +75,7 @@ function main() {
   try {
     for (let i = 2; i < process.argv.length; i++) {
       const a = process.argv[i];
-      if (a === '--help') { console.log('accord-validate.mjs --project DIR --scope installation|knowledge|commit|audit [--modules IDS]'); return; }
+      if (a === '--help') { console.log('tome-validate.mjs --project DIR --scope installation|knowledge|commit|audit [--modules IDS]'); return; }
       if (!['--project', '--scope', '--modules'].includes(a) || !process.argv[i + 1] || process.argv[i + 1].startsWith('--')) throw new Error('Unknown or incomplete option: ' + a);
       const value = process.argv[++i]; options[a.slice(2)] = a === '--modules' ? value.split(',') : value;
     }

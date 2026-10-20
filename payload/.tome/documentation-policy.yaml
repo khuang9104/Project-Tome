@@ -30,11 +30,11 @@
   ],
   "excludes": [
     {
-      "path": ".agents/skills/accord",
+      "path": ".agents/skills/tome",
       "reason": "Project Tome runtime, not product source."
     },
     {
-      "path": ".accord",
+      "path": ".tome",
       "reason": "Project Tome metadata and local hook."
     },
     {
@@ -46,7 +46,7 @@
       "reason": "Agent routing entry."
     },
     {
-      "path": "ACCORD-LICENSE",
+      "path": "TOME-LICENSE",
       "reason": "Project Tome distribution license."
     }
   ]

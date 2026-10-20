@@ -4,9 +4,9 @@ import crypto from 'node:crypto';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { parseExactJson, inspectContract, compareContracts } from './accord-contracts.mjs';
-import { captureObservation, readSnapshotFile, readSnapshotFiles, listSnapshotFiles, sourcePath, headRevision } from './accord-scope.mjs';
-import { CONFIG_SCHEMA, KNOWLEDGE_SCHEMA } from './accord-protocol.mjs';
+import { parseExactJson, inspectContract, compareContracts } from './tome-contracts.mjs';
+import { captureObservation, readSnapshotFile, readSnapshotFiles, listSnapshotFiles, sourcePath, headRevision } from './tome-scope.mjs';
+import { CONFIG_SCHEMA, KNOWLEDGE_SCHEMA } from './tome-protocol.mjs';
 
 export const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 export const ID = /^[A-Za-z][A-Za-z0-9._-]{0,127}$/;
@@ -48,11 +48,11 @@ export function validateDocumentationPolicy(policy) {
 }
 export function loadProjectModel(root, config = null, manifest = null, view = {}) {
   view = { ...view, cache: new Map() };
-  config ||= readJson(root, '.accord/accord.yaml', view);
-  if (config.schema_version !== CONFIG_SCHEMA || config.knowledge_base?.structure_version !== KNOWLEDGE_SCHEMA) throw new Error('Migrate configuration to 1.0 before using the knowledge runtime.');
+  config ||= readJson(root, '.tome/tome.yaml', view);
+  if (config.schema_version !== CONFIG_SCHEMA || config.knowledge_base?.structure_version !== KNOWLEDGE_SCHEMA) throw new Error('Only Project Tome configuration 1.0 and knowledge 2.0 are supported.');
   const manifestPath = config.knowledge_base.manifest || 'docs/manifest.yaml';
   manifest ||= readJson(root, manifestPath, view);
-  if (manifest.schema_version !== KNOWLEDGE_SCHEMA || manifest.structure !== 'accord-project-knowledge' ||
+  if (manifest.schema_version !== KNOWLEDGE_SCHEMA || manifest.structure !== 'tome-project-knowledge' ||
       !['draft', 'current'].includes(manifest.status) || !strings(manifest.module_files) || !Array.isArray(manifest.documents)) throw new Error('Expected knowledge 2.0 registry.');
   relativePath(manifest.knowledge_root);
   const policyPath = config.documentation?.policy;
@@ -89,7 +89,7 @@ export function loadProjectModel(root, config = null, manifest = null, view = {}
   if (manifest.exact_contracts !== undefined && (!Array.isArray(manifest.exact_contracts) || manifest.exact_contracts.length > 10000)) errors.push('Invalid exact-contract registry.');
   if (errors.length) throw new Error(errors.join('\n'));
   return { root, config, manifest, policy, modules, documents, view,
-    metadata_paths: ['.accord/accord.yaml', manifestPath, ...(policyPath ? [policyPath] : []), ...manifest.module_files],
+    metadata_paths: ['.tome/tome.yaml', manifestPath, ...(policyPath ? [policyPath] : []), ...manifest.module_files],
     fingerprint: digest(JSON.stringify({ manifest, policy, modules })) };
 }
 export function moduleClosure(model, seeds, impact = false) {
@@ -219,8 +219,8 @@ export function createPublicationManifest(model, { modules = null, audience = nu
   for (let i = 0; i < selected.length; i++) for (const id of selected[i].refs) { const d = model.documents.find(d => d.id === id); if (!ids.has(id) && allowed(d)) { selected.push(d); ids.add(id); } }
   const identity = value => JSON.stringify({ project: value.project, scope: value.scope?.slice().sort() || null, audience: value.audience, sensitivities: value.sensitivities?.slice().sort() });
   const selection = { project: model.config.project.id, scope: modules?.length ? [...modules].sort() : null, audience, sensitivities: [...sensitivities].sort(), release };
-  if (previous && (previous.schema_version !== '1.0' || previous.structure !== 'accord-publication-manifest' || identity(previous.selection) !== identity(selection) || !Array.isArray(previous.documents))) throw new Error('Previous publication selection differs.');
-  return { schema_version: '1.0', structure: 'accord-publication-manifest', selection, selected_modules: scope,
+  if (previous && (previous.schema_version !== '1.0' || previous.structure !== 'tome-publication-manifest' || identity(previous.selection) !== identity(selection) || !Array.isArray(previous.documents))) throw new Error('Previous publication selection differs.');
+  return { schema_version: '1.0', structure: 'tome-publication-manifest', selection, selected_modules: scope,
     modules: model.modules.filter(m => scope.includes(m.id) || selected.some(d => d.module === m.id)).map(m => ({ id: m.id, parent: m.parent, depends_on: m.depends_on, status: m.status, gaps: m.gaps, observation: m.observation || null })),
     observed_revision: headRevision(model.root), metadata_fingerprint: model.fingerprint,
     documents: selected.map(d => { const sha256 = digest(readBytes(model.root, d.path, undefined, model.view)); return { ...d, sha256, review_matches: d.review ? d.review.sha256 === sha256 : null, unresolved_context: d.refs.filter(id => !ids.has(id)) }; }),
@@ -233,7 +233,7 @@ function main() {
   try {
     for (let i = 2; i < process.argv.length; i++) {
       const a = process.argv[i];
-      if (a === '--help') { console.log('accord-project.mjs --project DIR [--modules IDS] [--documents IDS] [--query TEXT] [--impact|--validate|--review|--publish] [--staged] [--audience NAME] [--previous FILE] [--release ID]'); return; }
+      if (a === '--help') { console.log('tome-project.mjs --project DIR [--modules IDS] [--documents IDS] [--query TEXT] [--impact|--validate|--review|--publish] [--staged] [--audience NAME] [--previous FILE] [--release ID]'); return; }
       if (['--impact', '--validate', '--publish', '--review', '--staged'].includes(a)) opts[a.slice(2)] = true;
       else if (['--project', '--modules', '--documents', '--query', '--audience', '--previous', '--release'].includes(a) && process.argv[i + 1] && !process.argv[i + 1].startsWith('--')) { const value = process.argv[++i]; opts[a.slice(2)] = ['--modules', '--documents'].includes(a) ? value.split(',') : value; }
       else throw new Error('Unknown or incomplete option: ' + a);

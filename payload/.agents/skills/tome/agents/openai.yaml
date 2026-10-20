@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Tome Project Knowledge"
+  short_description: "Maintain project intent and implementation knowledge"
+  default_prompt: "Use $tome to recover relevant project context, record needs and decisions, maintain detailed implementation knowledge, and reconcile affected staged knowledge before a commit."

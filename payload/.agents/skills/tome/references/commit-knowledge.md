@@ -13,12 +13,12 @@
    of manufacturing prose edits.
 4. After reading meaning, generate candidate review hashes/observations:
 
-       node .agents/skills/accord/scripts/accord-project.mjs --project . --modules IDS --review --staged
+       node .agents/skills/tome/scripts/tome-project.mjs --project . --modules IDS --review --staged
 
    Use --documents IDs for standalone owners. Record candidates only after semantic
    review, with an honest basis; stage metadata and run:
 
-       node .agents/skills/accord/scripts/accord-validate.mjs --project . --scope commit
+       node .agents/skills/tome/scripts/tome-validate.mjs --project . --scope commit
 
    Add --modules IDs for affected consumers. This cannot remove direct owners.
    Reads use the index without worktree fallback. Missing/stale affected knowledge
@@ -29,9 +29,9 @@
 
 ## Local hook
 
-The shipped .accord/hooks/pre-commit runs the staged check. Activate explicitly:
+The shipped .tome/hooks/pre-commit runs the staged check. Activate explicitly:
 
-    node .agents/skills/accord/scripts/accord-hook.mjs --project . --install
+    node .agents/skills/tome/scripts/tome-hook.mjs --project . --install
 
 Setup refuses existing hooks/configuration: integrate the validator call into the
 existing hook and preserve its commands. Copying files does not activate hooks.

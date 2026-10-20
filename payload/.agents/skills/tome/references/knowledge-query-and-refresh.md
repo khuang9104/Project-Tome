@@ -1,6 +1,6 @@
 # Query and refresh
 
-Use accord-project.mjs --project . --query "business term, method or field" for
+Use tome-project.mjs --project . --query "business term, method or field" for
 registered metadata, aliases and bounded body search. Use --modules IDs for direct
 context; --impact adds reverse dependency candidates. Results contain owner paths,
 match excerpts, relevant intent, refs and gaps. Read those owners; check freshness.

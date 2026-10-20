@@ -1,7 +1,7 @@
 # Project Tome for Copilot
 
 Set up, inspect or update the repository-local Project Tome workflow from Copilot.
-The plugin provides one `accord-project` skill. After setup, the project retains
+The plugin provides one `tome-project` skill. After setup, the project retains
 its own intent, design decisions, implementation knowledge and Project Tome runtime for
 use across sessions, machines, Codex and Copilot.
 
@@ -15,7 +15,7 @@ copilot plugin install project-tome@project-tome
 Then open your target project and ask:
 
 ```text
-Use accord-project to set up or update Project Tome in this project with the plugin's
+Use tome-project to set up or update Project Tome in this project with the plugin's
 tested distribution. Preserve existing project content and custom rules, resolve
 only material conflicts with me, and verify the complete installation.
 ```
@@ -23,7 +23,7 @@ only material conflicts with me, and verify the complete installation.
 For an inspection without updates:
 
 ```text
-Use accord-project to report this project's Project Tome version and installation state.
+Use tome-project to report this project's Project Tome version and installation state.
 ```
 
 Git and Node.js are needed for project adoption. Fetching the pinned distribution
@@ -32,9 +32,9 @@ plugin does not bundle these prerequisites or install them automatically.
 
 ## Updates and boundaries
 
-The plugin has its own version. `skills/accord-project/references/distribution.json`
+The plugin has its own version. `skills/tome-project/references/distribution.json`
 pins the tested framework release, full commit and package digest. Project
-provenance lives in `.accord/installation.json` after adoption.
+provenance lives in `.tome/installation.json` after adoption.
 
 ```sh
 copilot plugin marketplace update project-tome

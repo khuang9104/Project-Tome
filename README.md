@@ -68,12 +68,12 @@ meaning and actual impact. The file inventory is not a universal AST extractor.
 In an adopted project, query a method or field and check knowledge coverage:
 
 ```sh
-node .agents/skills/accord/scripts/accord-project.mjs --project . --query "method or field"
-node .agents/skills/accord/scripts/accord-validate.mjs --project . --scope knowledge
+node .agents/skills/tome/scripts/tome-project.mjs --project . --query "method or field"
+node .agents/skills/tome/scripts/tome-validate.mjs --project . --scope knowledge
 ```
 
 For semantic review, staging and incremental commit checks, follow the installed
-[commit procedure](payload/.agents/skills/accord/references/commit-knowledge.md).
+[commit procedure](payload/.agents/skills/tome/references/commit-knowledge.md).
 It uses index contents without mixing in unstaged code. Local Git hook activation
 is explicit and preserves existing hooks; Git can bypass local hooks.
 
@@ -82,18 +82,18 @@ is explicit and preserves existing hooks; Git can bypass local hooks.
 | Read this | For |
 | --- | --- |
 | [Setup and updates](CONFIGURE_WITH_AGENT.md) | Install or merge Project Tome while preserving project content. |
-| [Shared Skill](payload/.agents/skills/accord/SKILL.md) | The common workflow for supported Agents. |
-| [Project memory](payload/.agents/skills/accord/references/project-memory.md) | Record evolving needs, decisions and continuity. |
-| [Detailed knowledge](payload/.agents/skills/accord/references/project-knowledge.md) | Modules, methods, interface fields and database definitions. |
-| [Knowledge retrieval](payload/.agents/skills/accord/references/knowledge-query-and-refresh.md) | Select relevant context and refresh affected owners. |
-| [Knowledge delivery](payload/.agents/skills/accord/references/knowledge-delivery.md) | Optional source-free exports for handoff. |
+| [Shared Skill](payload/.agents/skills/tome/SKILL.md) | The common workflow for supported Agents. |
+| [Project memory](payload/.agents/skills/tome/references/project-memory.md) | Record evolving needs, decisions and continuity. |
+| [Detailed knowledge](payload/.agents/skills/tome/references/project-knowledge.md) | Modules, methods, interface fields and database definitions. |
+| [Knowledge retrieval](payload/.agents/skills/tome/references/knowledge-query-and-refresh.md) | Select relevant context and refresh affected owners. |
+| [Knowledge delivery](payload/.agents/skills/tome/references/knowledge-delivery.md) | Optional source-free exports for handoff. |
 
 ## Package
 
 The payload/ directory contains copyable runtime files, knowledge seeds and marked
 Agent entry blocks. RELEASE.json and SHA256SUMS identify its file set. Schema versions
 are configuration **1.0** and knowledge **2.0**. Existing knowledge IDs, document paths
-and refs are preserved by the migration proposal.
+and refs are preserved during Project Tome updates.
 
 Package checks do not establish document meaning or deployed behavior. Database
 knowledge can be maintained from repository definitions without live access.
@@ -101,9 +101,9 @@ The optional [Copilot setup plugin](plugins/project-tome/README.md) pins its ver
 distribution by full commit and package digest. Plugin updates and project updates
 are separate operations.
 
-For upgrade compatibility, `.accord` paths, `accord-*` helpers and the `accord`
-and `accord-project` Skill names remain stable. Historical installation commits
-and checksums stay intact; the new plugin ID is `project-tome`.
+The runtime uses `.tome/tome.yaml`, `tome-*` helpers and the `tome` shared Skill;
+the setup Skill is `tome-project`. Previous names, layouts and schema formats are
+unsupported; there are no compatibility aliases or automatic migration adapters.
 
 ## License
 

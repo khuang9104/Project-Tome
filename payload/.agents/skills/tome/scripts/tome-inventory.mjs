@@ -3,10 +3,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { loadProjectModel } from './accord-project.mjs';
+import { loadProjectModel } from './tome-project.mjs';
 
 const HARD_EXCLUDES = new Set([
-  '.git', '.accord', '.agents',
+  '.git', '.tome', '.agents',
   'node_modules', 'vendor', 'dist', 'build', 'out', 'target', 'coverage',
   '.next', '.nuxt', '.cache', '.turbo', '.venv', 'venv', '__pycache__'
 ]);
@@ -74,7 +74,7 @@ function ignoredProjectPaths(projectRoot, timeout) {
 }
 
 function loadConfig(projectRoot) {
-  const configPath = path.join(projectRoot, '.accord', 'accord.yaml');
+  const configPath = path.join(projectRoot, '.tome', 'tome.yaml');
   if (!fs.existsSync(configPath)) {
     return {};
   }
@@ -300,7 +300,7 @@ function parseArgs(argv) {
 function main() {
   const parsed = parseArgs(process.argv.slice(2));
   if (parsed.help) {
-    console.log('Usage: node accord-inventory.mjs [--project <path>]');
+    console.log('Usage: node tome-inventory.mjs [--project <path>]');
     return;
   }
   if (parsed.error) {

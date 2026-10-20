@@ -13,53 +13,53 @@ Replace path/ID examples with inspected values and quote paths containing spaces
    metadata, guide and scripts. Verify the same package:
 
    ```sh
-   node <distribution>/payload/.agents/skills/accord/scripts/accord-adoption.mjs --mode verify-package --package <distribution>
+   node <distribution>/payload/.agents/skills/tome/scripts/tome-adoption.mjs --mode verify-package --package <distribution>
    ```
 
-2. Inspect target Git, identity, existing docs/Skills and Agent entries. For an old
-   schema run its current source's accord-migrate.mjs --project TARGET. Plan:
+2. Inspect target Git, identity, existing docs/Skills and Agent entries. Only current
+   Project Tome paths and schemas are supported. Plan:
 
    ```sh
-   node <distribution>/payload/.agents/skills/accord/scripts/accord-adoption.mjs --mode plan --project <target> --package <distribution>
+   node <distribution>/payload/.agents/skills/tome/scripts/tome-adoption.mjs --mode plan --project <target> --package <distribution>
    ```
 
    Add --previous-package ACTUAL_OLD_PACKAGE for a known three-way baseline.
    Apply authorized merges; preserve project documents and local customizations.
    Change only marked Project Tome blocks in AGENTS.md and Copilot instructions. Downgrade
    or unknown transitions need a decision. Resolve conflicts before recording.
-3. Set project identity in .accord/accord.yaml. Register existing knowledge owners,
+3. Set project identity in .tome/tome.yaml. Register existing knowledge owners,
    replacing draft seed prompts with actual project facts where used. Index all
    maintained modules/source responsibilities; explain important ones and keep
-   unrelated historical detail gaps explicit. Migrate durable needs/decisions from
-   legacy records before retiring old controls. Do not convert historical evidence
+   unrelated historical detail gaps explicit. Preserve durable needs/decisions in
+   canonical project documents. Do not convert historical evidence
    into approval or reset unrelated project files/Skills.
 4. Generate an installation record with observed source values:
 
    ```sh
-   node <distribution>/payload/.agents/skills/accord/scripts/accord-adoption.mjs --mode record --project <target> --package <distribution> --revision <observed-full-source-commit> --worktree <clean-or-dirty-or-unknown>
+   node <distribution>/payload/.agents/skills/tome/scripts/tome-adoption.mjs --mode record --project <target> --package <distribution> --revision <observed-full-source-commit> --worktree <clean-or-dirty-or-unknown>
    ```
 
-   After success/review write the printed JSON to .accord/installation.json.
+   After success/review write the printed JSON to .tome/installation.json.
    Do not redirect a failed command over an existing record. Source revision means
    distribution commit, not target HEAD. Dirty packages remain dirty provenance.
    Local runtime differences need actual hashes/bases via --local-changes <file>.
 5. Verify against that exact package, then inspect knowledge separately:
 
    ```sh
-   node <distribution>/payload/.agents/skills/accord/scripts/accord-adoption.mjs --mode verify-installation --project <target> --package <distribution>
-   node <target>/.agents/skills/accord/scripts/accord-validate.mjs --project <target> --scope installation
-   node <target>/.agents/skills/accord/scripts/accord-validate.mjs --project <target> --scope knowledge
+   node <distribution>/payload/.agents/skills/tome/scripts/tome-adoption.mjs --mode verify-installation --project <target> --package <distribution>
+   node <target>/.agents/skills/tome/scripts/tome-validate.mjs --project <target> --scope installation
+   node <target>/.agents/skills/tome/scripts/tome-validate.mjs --project <target> --scope knowledge
    ```
 
    Installation checks do not claim semantic completeness. Knowledge audit can
    remain partial for unrelated historical gaps; affected commit scope cannot.
-6. For local hook integration review .accord/hooks/pre-commit, then explicitly run
-   accord-hook.mjs --project TARGET --install. Existing hooks/configuration are
+6. For local hook integration review .tome/hooks/pre-commit, then explicitly run
+   tome-hook.mjs --project TARGET --install. Existing hooks/configuration are
    refused: preserve them and integrate the validator call manually. Git can bypass
    hooks; Agent semantic reconciliation before commit is still required.
 
-Follow the installed [shared Skill](payload/.agents/skills/accord/SKILL.md) and
-[adoption procedure](payload/.agents/skills/accord/references/adoption-and-update.md).
+Follow the installed [shared Skill](payload/.agents/skills/tome/SKILL.md) and
+[adoption procedure](payload/.agents/skills/tome/references/adoption-and-update.md).
 No hosted service, GitHub account, live database or mandatory testing workflow is
 required. Same-project clones retain identity and knowledge. Package hashes prove
 file identity, not publisher authenticity or document meaning.
@@ -71,11 +71,10 @@ file identity, not publisher authenticity or document meaning.
 
 1. 检查同一份来源的真实完整 Git 提交、工作区状态、指南及脚本，用 verify-package
    核对包内容；不把 dirty 的工作区记成 clean，不伪造来源。
-2. 检查目标项目已有配置、文档、Skill、Git 和 Agent 指令。旧格式先生成迁移方案，
-   再 plan。只有确切的旧包才能作为 previous-package；保留项目内容与入口块外的指令，
+2. 检查目标项目已有配置、文档、Skill、Git 和 Agent 指令。使用当前 Project Tome 路径和格式后再 plan，旧版不提供自动迁移。只有确切的旧包才能作为 previous-package；保留项目内容与入口块外的指令，
    处理实际冲突，降级或未知版本转换需要用户决策。
 3. 设置项目身份，复用现有文档，建立全部维护源码/模块的索引，详解重要模块，保留无关
-   历史细节缺口。把旧记录中的目标、理由和未完成事项整理进记忆后再退出旧控制。
+   历史细节缺口。保留已撰写的目标、理由和未完成事项，整理进项目记忆。
 4. 合并成功后，record 使用真实来源提交和状态生成 JSON；审阅后写入 installation.json。
    不用失败命令覆盖旧记录。已审阅的运行文件定制需提供准确哈希和理由。
 5. 针对同一包运行 verify-installation 和 installation 范围检查；knowledge 检查单独报告

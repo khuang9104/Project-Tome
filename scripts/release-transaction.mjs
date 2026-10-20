@@ -5,12 +5,12 @@ import path from 'node:path';
 export function replaceGeneratedArtifacts(releaseRoot, stagingRoot, filesystem = fs) {
   const root = fs.realpathSync(releaseRoot);
   const stage = fs.realpathSync(stagingRoot);
-  if (path.dirname(stage) !== root || !path.basename(stage).startsWith('.accord-release-build-')) {
+  if (path.dirname(stage) !== root || !path.basename(stage).startsWith('.tome-release-build-')) {
     throw new Error('Release staging must be a dedicated direct child of the release directory.');
   }
-  const targets = ['payload', 'vendor', 'RELEASE.json', 'SHA256SUMS'].map(name => ({
+  const targets = ['payload', 'RELEASE.json', 'SHA256SUMS'].map(name => ({
     staged: path.join(stage, name), destination: path.join(root, name),
-    backup: path.join(root, name + '.accord-backup-' + process.pid), backedUp: false, installed: false
+    backup: path.join(root, name + '.tome-backup-' + process.pid), backedUp: false, installed: false
   }));
   // Preflight all paths before the first move; never overwrite a recovery copy.
   for (const target of targets) {

@@ -58,11 +58,11 @@ Project Tome 把项目要做什么、为什么这样设计、代码如何运作�
 在已接入 Project Tome 的项目中，可以查询方法或字段，并检查知识覆盖情况：
 
 ```sh
-node .agents/skills/accord/scripts/accord-project.mjs --project . --query "方法或字段"
-node .agents/skills/accord/scripts/accord-validate.mjs --project . --scope knowledge
+node .agents/skills/tome/scripts/tome-project.mjs --project . --query "方法或字段"
+node .agents/skills/tome/scripts/tome-validate.mjs --project . --scope knowledge
 ```
 
-语义审阅、暂存及增量提交检查见[提交前维护流程](payload/.agents/skills/accord/references/commit-knowledge.md)。
+语义审阅、暂存及增量提交检查见[提交前维护流程](payload/.agents/skills/tome/references/commit-knowledge.md)。
 检查使用 index 中的内容，不混入未暂存代码。本地 Git 钩子需要显式启用或整合已有钩子，
 Git 本身可以绕过本地钩子。
 
@@ -71,24 +71,24 @@ Git 本身可以绕过本地钩子。
 | 文档 | 适合查阅的内容 |
 | --- | --- |
 | [安装与更新](CONFIGURE_WITH_AGENT.md) | 在保留项目内容的前提下接入或合并 Project Tome。 |
-| [共享 Skill](payload/.agents/skills/accord/SKILL.md) | 支持的 Agent 共用的维护流程。 |
-| [项目记忆](payload/.agents/skills/accord/references/project-memory.md) | 持续记录需求、决策及续接上下文。 |
-| [详细知识](payload/.agents/skills/accord/references/project-knowledge.md) | 模块、方法、接口字段及数据库定义。 |
-| [知识检索](payload/.agents/skills/accord/references/knowledge-query-and-refresh.md) | 选择相关上下文、刷新受影响文档。 |
-| [知识交付](payload/.agents/skills/accord/references/knowledge-delivery.md) | 按需导出不含应用源码的交接知识集。 |
+| [共享 Skill](payload/.agents/skills/tome/SKILL.md) | 支持的 Agent 共用的维护流程。 |
+| [项目记忆](payload/.agents/skills/tome/references/project-memory.md) | 持续记录需求、决策及续接上下文。 |
+| [详细知识](payload/.agents/skills/tome/references/project-knowledge.md) | 模块、方法、接口字段及数据库定义。 |
+| [知识检索](payload/.agents/skills/tome/references/knowledge-query-and-refresh.md) | 选择相关上下文、刷新受影响文档。 |
+| [知识交付](payload/.agents/skills/tome/references/knowledge-delivery.md) | 按需导出不含应用源码的交接知识集。 |
 
 ## 分发内容
 
 payload/ 包含可复制的运行文件、知识模板与 Agent 入口块；RELEASE.json 和 SHA256SUMS
-标识包内文件。配置版本为 **1.0**，知识版本为 **2.0**。迁移方案保留已有知识 ID、
+标识包内文件。配置版本为 **1.0**，知识版本为 **2.0**。Project Tome 更新保留已有知识 ID、
 文档路径与引用关系。
 
 包校验不能证明文档含义完整或上线行为已验证。数据库知识可直接依据仓库定义维护，
 不要求现场连接。可选 [Copilot 接入插件](plugins/project-tome/README.md) 使用完整提交和包摘要
 锁定已核验的分发；插件更新和目标项目更新分别执行。
 
-为兼容已有项目，`.accord` 路径、`accord-*` 工具及 `accord`、`accord-project` Skill 名称保留。
-旧安装的来源提交与校验和保持原样，新插件标识为 `project-tome`。
+运行配置位于 `.tome/tome.yaml`，工具使用 `tome-*`，共享 Skill 为 `tome`，接入 Skill 为
+`tome-project`。旧名称、旧路径及旧格式均不受支持，不提供兼容别名或自动迁移。
 
 ## 许可证
 
